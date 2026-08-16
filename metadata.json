@@ -1,0 +1,6 @@
+{
+  "name": "GEARTRADE - Outdoor Gears & Apparel Nepal",
+  "description": "Nepal's premier outdoor performance apparel, trekking gear, and footwear brand with authentic NPR pricing, Fonepay & COD checkout, and an integrated Admin Logistics & Product Manager.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
