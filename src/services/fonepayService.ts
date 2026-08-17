@@ -61,9 +61,23 @@ export function generateFonepayDV(
  * Generates an EMVCo compliant Dynamic Fonepay QR string and base64 SVG/PNG Data URL
  */
 export async function generateFonepayDynamicQR(
-  order: { prn: string; totalAmount: number; customer: { fullName: string; phone: string } },
-  credentials: FonepayCredentials = DEFAULT_FONEPAY_CREDENTIALS
+  orderInput: { prn: string; totalAmount: number; customer: { fullName: string; phone: string } } | number,
+  credentialsOrDesc?: FonepayCredentials | string
 ): Promise<FonepayDynamicQRData> {
+  const credentials: FonepayCredentials =
+    typeof credentialsOrDesc === 'object' && credentialsOrDesc !== null
+      ? credentialsOrDesc
+      : DEFAULT_FONEPAY_CREDENTIALS;
+
+  const order =
+    typeof orderInput === 'number'
+      ? {
+          prn: `PRN-${Date.now().toString().slice(-8)}`,
+          totalAmount: orderInput,
+          customer: { fullName: 'GEARTRADE Customer', phone: '9800000000' },
+        }
+      : orderInput;
+
   const traceId = `FP-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
   const now = new Date();
   const dateFormatted = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}/${now.getFullYear()}`;
@@ -83,16 +97,6 @@ export async function generateFonepayDynamicQR(
   );
 
   // EMVCo Fonepay QR Payload Format
-  // Tag 00: Payload Format Indicator (01)
-  // Tag 01: Point of Initiation Method (12 - Dynamic)
-  // Tag 26: Merchant Account Information (Fonepay Global ID)
-  // Tag 52: Merchant Category Code (5999)
-  // Tag 53: Transaction Currency (524 - NPR)
-  // Tag 54: Transaction Amount
-  // Tag 58: Country Code (NP)
-  // Tag 59: Merchant Name
-  // Tag 60: Merchant City (Kathmandu)
-  // Tag 62: Additional Data Field (Trace ID & PRN)
   const qrString = `00020101021226480010np.fonepay0116${credentials.merchantCode}0216${order.prn}52045999530352454${amountStr.length.toString().padStart(2, '0')}${amountStr}5802NP5911PASAL_NEPAL6009Kathmandu62300116${traceId}0506${order.customer.phone.slice(-6)}6304`;
 
   // Generate QR image data URL with high contrast and optimal error correction

@@ -47,6 +47,37 @@ export interface Product {
   supplier?: string;
 }
 
+export interface HeroSlideItem {
+  id: string | number;
+  titleTop: string;
+  titleMain: string;
+  collection: string;
+  description: string;
+  image: string;
+  ctaText: string;
+  targetCategory: ProductCategory;
+}
+
+export interface CategoryTileItem {
+  id: ProductCategory;
+  title: string;
+  subtitle: string;
+  image: string;
+  itemCount?: string;
+  badge?: string;
+}
+
+export interface StorefrontPromoBanner {
+  id: string;
+  title: string;
+  subtitle: string;
+  tagline: string;
+  image: string;
+  buttonText: string;
+  targetCategory?: ProductCategory;
+  isActive: boolean;
+}
+
 export interface Coupon {
   code: string;
   discountType: 'percentage' | 'flat';
@@ -107,23 +138,44 @@ export type PaymentMethodType = 'fonepay_qr' | 'fonepay_web' | 'esewa' | 'khalti
 
 export interface Order {
   id: string;
-  prn: string; // Payment Reference Number
-  date: string;
-  nepaliDate: string;
-  customer: CustomerDetails;
+  prn?: string; // Payment Reference Number
+  trackingCode?: string;
+  date?: string;
+  createdAt?: string;
+  nepaliDate?: string;
+  nepaliDateBS?: string;
+  customer?: CustomerDetails;
+  customerDetails?: CustomerDetails;
   items: CartItem[];
   subtotal: number;
   discount: number;
   couponCode?: string;
   deliveryCharge: number;
-  taxAmount: number; // 13% VAT standard in Nepal
-  totalAmount: number;
+  taxAmount?: number; // 13% VAT standard in Nepal
+  vatAmount?: number;
+  totalAmount?: number;
+  grandTotal?: number;
   paymentMethod: PaymentMethodType;
-  paymentStatus: 'pending' | 'verified' | 'failed' | 'cod_pending';
-  orderStatus: 'confirmed' | 'processing' | 'shipped' | 'out_for_delivery' | 'delivered';
+  paymentStatus: 'pending' | 'verified' | 'failed' | 'cod_pending' | 'completed';
+  orderStatus: 'confirmed' | 'processing' | 'shipped' | 'out_for_delivery' | 'delivered' | 'order_placed' | 'dispatched';
   fonepayTraceId?: string;
   fonepayTransactionId?: string;
-  merchantPan: string;
+  fonepayBankName?: string;
+  merchantPan?: string;
+  estimatedDeliveryDays?: string;
+  courierPartner?: string;
+  awbNumber?: string;
+  riderName?: string;
+  riderPhone?: string;
+  logisticsNotes?: string;
+  trackingUpdates?: Array<{
+    id: string;
+    status: string;
+    timestamp: string;
+    location: string;
+    description: string;
+    completed: boolean;
+  }>;
 }
 
 export interface Province {

@@ -1,126 +1,137 @@
 import React from 'react';
-import { ArrowUpRight } from 'lucide-react';
-import { ProductCategory } from '../types';
+import { ArrowRight, Camera } from 'lucide-react';
+import { ProductCategory, CategoryTileItem } from '../types';
 
 interface CategoryTilesProps {
   selectedCategory: ProductCategory;
   onSelectCategory: (cat: ProductCategory) => void;
+  customCards?: CategoryTileItem[];
+  isAdmin?: boolean;
+  onOpenVisualStudio?: () => void;
 }
 
-interface CategoryCardItem {
-  id: ProductCategory;
-  title: string;
-  subtitle: string;
-  image: string;
-  itemCount: string;
-}
-
-const CATEGORY_CARDS: CategoryCardItem[] = [
+export const DEFAULT_CATEGORY_CARDS: CategoryTileItem[] = [
   {
     id: 'mens',
-    title: "MEN'S",
-    subtitle: 'Windcheaters & Flex Pants',
-    image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=600&q=80',
-    itemCount: '18+ Items',
+    title: "MEN'S APPAREL",
+    subtitle: 'Windcheaters, Down Jackets & Trek Pants',
+    image: 'https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=800&q=80',
+    itemCount: 'EXPLORE',
   },
   {
     id: 'womens',
-    title: "WOMEN'S",
-    subtitle: 'Trail Shells & Trekkers',
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80',
-    itemCount: '14+ Items',
-  },
-  {
-    id: 'kids',
-    title: "KIDS'",
-    subtitle: 'Junior Adventure Gear',
-    image: 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=600&q=80',
-    itemCount: '10+ Items',
+    title: "WOMEN'S COLLECTION",
+    subtitle: 'Lightweight Shells, Fleeces & Trekkers',
+    image: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
+    itemCount: 'EXPLORE',
   },
   {
     id: 'bags_gears',
-    title: 'BAGS&GEARS',
-    subtitle: '45L Packs & Carbon Poles',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80',
-    itemCount: '16+ Items',
+    title: 'BACKPACKS & GEARS',
+    subtitle: '45L-65L Packs, Carbon Poles & Tents',
+    image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=800&q=80',
+    itemCount: 'EXPLORE',
   },
   {
     id: 'shoes',
-    title: 'SHOES',
-    subtitle: 'Vibram Traction & Trail Runners',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
-    itemCount: '12+ Items',
+    title: 'FOOTWEAR',
+    subtitle: 'Traction Trail Runners & Alpine Boots',
+    image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?auto=format&fit=crop&w=800&q=80',
+    itemCount: 'EXPLORE',
+  },
+  {
+    id: 'kids',
+    title: "JUNIOR & KIDS",
+    subtitle: 'Youth Thermal Layers & Rainwear',
+    image: 'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=800&q=80',
+    itemCount: 'EXPLORE',
   },
 ];
 
 export const CategoryTiles: React.FC<CategoryTilesProps> = ({
   selectedCategory,
   onSelectCategory,
+  customCards,
+  isAdmin = false,
+  onOpenVisualStudio,
 }) => {
+  const cards = (customCards && customCards.length > 0) ? customCards : DEFAULT_CATEGORY_CARDS;
+
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 font-sans">
       {/* Section Header */}
-      <div className="flex items-end justify-between mb-6">
+      <div className="flex items-end justify-between mb-7 border-b border-stone-200 dark:border-stone-800 pb-4 transition-colors">
         <div>
-          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[#DE4B56]">
-            EXPLORE COLLECTIONS
+          <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-stone-400 dark:text-stone-500 block mb-1">
+            CURATED COLLECTIONS
           </span>
-          <h2 className="text-xl sm:text-2xl font-black text-[#102A45] tracking-tight uppercase mt-0.5">
+          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight uppercase">
             SHOP BY CATEGORY
           </h2>
         </div>
-        <button
-          onClick={() => onSelectCategory('all')}
-          className="text-xs font-bold text-[#102A45] hover:text-[#DE4B56] transition-colors flex items-center gap-1 cursor-pointer"
-        >
-          <span>View All Products</span>
-          <ArrowUpRight className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-3">
+          {isAdmin && onOpenVisualStudio && (
+            <button
+              onClick={onOpenVisualStudio}
+              className="px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black border border-stone-300 dark:border-stone-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Camera className="w-3.5 h-3.5 text-amber-500" />
+              <span>Change Photos</span>
+            </button>
+          )}
+          <button
+            onClick={() => onSelectCategory('all')}
+            className="text-xs font-bold text-black dark:text-stone-300 hover:text-stone-600 dark:hover:text-white transition-colors flex items-center gap-1 cursor-pointer uppercase tracking-wider"
+          >
+            <span>View All Gear</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
-      {/* 5 Category Cards Grid matching Image 2 */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        {CATEGORY_CARDS.map((cat) => {
+      {/* Category Cards Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
+        {cards.map((cat) => {
           const isSelected = selectedCategory === cat.id;
           return (
             <div
               key={cat.id}
               onClick={() => onSelectCategory(cat.id)}
-              className={`group relative h-64 sm:h-72 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300 border ${
+              className={`group relative h-72 sm:h-80 overflow-hidden cursor-pointer transition-all duration-300 border ${
                 isSelected
-                  ? 'border-[#102A45] ring-2 ring-[#102A45] scale-[1.02]'
-                  : 'border-stone-200 hover:border-stone-300'
+                  ? 'border-black dark:border-white ring-1 ring-black dark:ring-white scale-[1.01]'
+                  : 'border-stone-200 dark:border-stone-850 hover:shadow-lg'
               }`}
             >
               {/* Background Photo */}
               <img
                 src={cat.image}
                 alt={cat.title}
-                className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
+                className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
                 loading="lazy"
               />
 
               {/* Dark Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 group-hover:from-black/90 transition-colors" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent group-hover:from-black/95 transition-colors" />
 
-              {/* Centered / Bottom Card Typography */}
-              <div className="absolute inset-0 p-4 flex flex-col justify-end text-white">
-                <span className="text-[10px] font-bold text-[#F5A623] tracking-widest uppercase mb-1">
-                  {cat.itemCount}
+              {/* Card Typography */}
+              <div className="absolute inset-0 p-4 sm:p-5 flex flex-col justify-end text-white">
+                <span className="text-[9px] font-bold text-stone-300 tracking-[0.2em] uppercase mb-1">
+                  GEARTRADE SERIES
                 </span>
 
-                <h3 className="text-base sm:text-lg font-black tracking-wider uppercase text-white leading-tight drop-shadow-md group-hover:text-amber-200 transition-colors">
+                <h3 className="text-sm sm:text-base font-black tracking-wide uppercase text-white leading-tight">
                   {cat.title}
                 </h3>
 
-                <p className="text-[11px] text-slate-300 font-medium truncate mt-0.5 opacity-90">
+                <p className="text-[11px] text-stone-300 font-light truncate mt-0.5 opacity-80">
                   {cat.subtitle}
                 </p>
 
-                {/* Explore Pill Button */}
-                <div className="mt-3 pt-2 border-t border-white/20 flex items-center justify-between text-[11px] font-bold text-white group-hover:text-[#DE4B56] transition-colors">
+                {/* Explore Action */}
+                <div className="mt-3 pt-2 border-t border-white/20 flex items-center justify-between text-[10px] font-bold tracking-widest text-white uppercase group-hover:text-stone-200 transition-colors">
                   <span>SHOP NOW</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                 </div>
               </div>
             </div>

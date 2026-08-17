@@ -456,10 +456,8 @@ export const AdminProductManagerModal: React.FC<AdminProductManagerModalProps> =
 
             <button
               onClick={() => {
-                if (confirm('Reset all catalog products back to original factory defaults? Any custom added products will be replaced.')) {
-                  onResetDefaults();
-                  showAlert('Product catalog reset to defaults');
-                }
+                onResetDefaults();
+                showAlert('Product catalog reset to defaults');
               }}
               className="p-2 text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               title="Reset to factory catalog"
@@ -692,10 +690,8 @@ export const AdminProductManagerModal: React.FC<AdminProductManagerModalProps> =
                                 </button>
                                 <button
                                   onClick={() => {
-                                    if (confirm(`Are you sure you want to delete "${p.name}"?`)) {
-                                      onDeleteProduct(p.id);
-                                      showAlert(`Deleted ${p.name}`);
-                                    }
+                                    onDeleteProduct(p.id);
+                                    showAlert(`Deleted ${p.name}`);
                                   }}
                                   className="p-1.5 bg-rose-50 hover:bg-rose-600 hover:text-white rounded-lg text-rose-600 transition-colors cursor-pointer"
                                   title="Delete product"

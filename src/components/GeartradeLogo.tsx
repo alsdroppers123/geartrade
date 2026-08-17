@@ -1,8 +1,9 @@
 import React from 'react';
+import { useTheme } from '../context/ThemeContext';
 
 interface GeartradeLogoProps {
   variant?: 'full' | 'mark' | 'badge' | 'horizontal';
-  theme?: 'dark' | 'light' | 'mono' | 'white';
+  theme?: 'dark' | 'light' | 'mono' | 'white' | 'auto';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   showTagline?: boolean;
@@ -10,112 +11,104 @@ interface GeartradeLogoProps {
 
 export const GeartradeLogo: React.FC<GeartradeLogoProps> = ({
   variant = 'full',
-  theme = 'dark',
+  theme = 'auto',
   size = 'md',
   className = '',
   showTagline = false,
 }) => {
-  // Color palette matching Image 1
-  const isWhite = theme === 'white';
-  const isMono = theme === 'mono';
+  let isDarkMode = false;
+  try {
+    const themeCtx = useTheme();
+    isDarkMode = themeCtx.isDark;
+  } catch {
+    isDarkMode = false;
+  }
 
-  const navyColor = isWhite ? '#FFFFFF' : isMono ? '#111827' : '#102A45';
-  const redColor = isWhite ? '#FFFFFF' : isMono ? '#4B5563' : '#DE4B56';
-  const goldColor = isWhite ? '#FFFFFF' : isMono ? '#9CA3AF' : '#F5A623';
-  const textColor = isWhite ? '#FFFFFF' : '#102A45';
+  const isDarkCanvas = theme === 'white' || (theme === 'auto' && isDarkMode);
+  const primaryColor = isDarkCanvas ? '#FFFFFF' : '#0F172A';
 
-  const sizeClasses = {
-    sm: { icon: 'w-6 h-6', text: 'text-xs', height: 28 },
-    md: { icon: 'w-8 h-8', text: 'text-sm', height: 38 },
-    lg: { icon: 'w-11 h-11', text: 'text-lg', height: 50 },
-    xl: { icon: 'w-16 h-16', text: 'text-2xl', height: 72 },
+  const sizeConfigs = {
+    sm: { iconWidth: 32, iconHeight: 18, textClass: 'text-xs tracking-[0.2em]', heightClass: 'h-6' },
+    md: { iconWidth: 44, iconHeight: 24, textClass: 'text-sm sm:text-base tracking-[0.22em]', heightClass: 'h-8' },
+    lg: { iconWidth: 56, iconHeight: 30, textClass: 'text-lg sm:text-xl tracking-[0.24em]', heightClass: 'h-10' },
+    xl: { iconWidth: 72, iconHeight: 38, textClass: 'text-2xl sm:text-3xl tracking-[0.26em]', heightClass: 'h-12' },
   }[size];
 
-  // SVG representation of the exact GT Monogram from Image 1
-  const GTMarkSVG = (
+  // Official GEARTRADE "GT" Aerodynamic Speed Emblem
+  const GTEmblemSVG = (
     <svg
-      viewBox="0 0 160 120"
-      className={`${sizeClasses.icon} shrink-0`}
-      fill="none"
+      viewBox="0 0 138 72"
+      width={sizeConfigs.iconWidth}
+      height={sizeConfigs.iconHeight}
+      className="shrink-0 transition-colors duration-200"
+      fill={primaryColor}
       xmlns="http://www.w3.org/2000/svg"
-      aria-label="GEARTRADE Logo Mark"
+      aria-label="GEARTRADE Official GT Emblem"
     >
-      {/* Outer Curved 'G' body in Navy Blue */}
+      {/* The Iconic Stylized 'G' Loop */}
       <path
-        d="M80 16C50 16 26 36 26 64C26 92 50 112 80 112H90V88H76C60 88 48 76 48 64C48 52 60 40 76 40H88L96 16H80Z"
-        fill={navyColor}
+        d="M74 12 L38 12 C 18 12, 6 22, 6 36 C 6 50, 18 60, 38 60 L62 60 L62 50 L38 50 C 24 50, 16 44, 16 36 C 16 28, 24 22, 38 22 L67.5 22 L74 12 Z"
       />
 
-      {/* Top Stripe (Navy Blue) */}
-      <polygon
-        points="70,24 148,24 148,38 64,38"
-        fill={navyColor}
+      {/* Speed Stripe 1 (Top Bar of 'T') */}
+      <path
+        d="M58 24.5 L132 24.5 L127.5 30 L54 30 Z"
       />
 
-      {/* Middle Stripe (Coral / Crimson Red) */}
-      <polygon
-        points="60,44 144,44 144,58 54,58"
-        fill={redColor}
+      {/* Speed Stripe 2 (Middle Bar of 'T') */}
+      <path
+        d="M52.5 33 L126.5 33 L122 38.5 L48.5 38.5 Z"
       />
 
-      {/* Bottom Stripe (Warm Gold / Amber) */}
-      <polygon
-        points="50,64 140,64 140,78 44,78"
-        fill={goldColor}
+      {/* Speed Stripe 3 (Bottom Bar of 'T') */}
+      <path
+        d="M47 41.5 L121 41.5 L116.5 47 L43 47 Z"
       />
 
-      {/* Vertical 'T' stem with angled cut at bottom */}
-      <polygon
-        points="96,44 116,44 116,112 96,112 96,44"
-        fill={navyColor}
+      {/* Vertical 'T' Stem with Bottom Chiseled Contour */}
+      <path
+        d="M73 47 L82.5 47 L82.5 68 L73 72 Z"
+      />
+      <path
+        d="M82.5 58 L84 62 L84 66 L82.5 68 Z"
+        opacity="0.6"
       />
     </svg>
   );
 
   if (variant === 'mark') {
-    return <div className={`inline-flex items-center ${className}`}>{GTMarkSVG}</div>;
+    return <div className={`inline-flex items-center ${className}`}>{GTEmblemSVG}</div>;
   }
 
   if (variant === 'badge') {
     return (
       <div
-        className={`inline-flex items-center justify-center p-2.5 rounded-2xl bg-[#102A45] shadow-lg border border-slate-700/50 ${className}`}
+        className={`inline-flex items-center justify-center p-2 transition-colors duration-200 ${
+          isDarkCanvas ? 'bg-white/10 text-white' : 'bg-stone-900 text-white'
+        } ${className}`}
       >
-        <svg
-          viewBox="0 0 160 120"
-          className={sizeClasses.icon}
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M80 16C50 16 26 36 26 64C26 92 50 112 80 112H90V88H76C60 88 48 76 48 64C48 52 60 40 76 40H88L96 16H80Z"
-            fill="#FFFFFF"
-          />
-          <polygon points="70,24 148,24 148,38 64,38" fill="#FFFFFF" />
-          <polygon points="60,44 144,44 144,58 54,58" fill="#DE4B56" />
-          <polygon points="50,64 140,64 140,78 44,78" fill="#F5A623" />
-          <polygon points="96,44 116,44 116,112 96,112 96,44" fill="#FFFFFF" />
-        </svg>
+        {GTEmblemSVG}
       </div>
     );
   }
 
   return (
-    <div className={`inline-flex items-center gap-2.5 sm:gap-3.5 select-none ${className}`}>
-      {GTMarkSVG}
-      <div className="flex flex-col">
+    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
+      {GTEmblemSVG}
+      <div className="flex flex-col justify-center">
         <span
-          className={`font-black uppercase tracking-[0.22em] font-sans leading-none ${sizeClasses.text}`}
-          style={{ color: textColor }}
+          className={`font-black uppercase font-sans leading-none ${sizeConfigs.textClass} transition-colors duration-200`}
+          style={{ color: primaryColor }}
         >
           GEARTRADE
         </span>
         {showTagline && (
-          <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-slate-400 font-semibold mt-0.5">
-            Outdoor Performance Nepal
+          <span className="text-[8px] sm:text-[9px] uppercase tracking-[0.25em] text-stone-400 dark:text-stone-500 font-semibold mt-1">
+            Nepal Mountain Gear
           </span>
         )}
       </div>
     </div>
   );
 };
+

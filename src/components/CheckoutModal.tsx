@@ -22,6 +22,7 @@ import {
   formatNPR,
   getNepaliDateBS
 } from '../services/fonepayService';
+import { GeartradeLogo } from './GeartradeLogo';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -98,18 +99,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   }, [customer.provinceId]);
 
-  // Countdown timer for QR
+  // QR Expiration Countdown
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    let timer: any;
     if (step === 'processing_fonepay' && timeLeft > 0) {
       timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            return 0;
-          }
-          return prev - 1;
-        });
+        setTimeLeft((prev) => prev - 1);
       }, 1000);
     }
     return () => clearInterval(timer);
@@ -119,75 +114,74 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const validateDetails = (): boolean => {
     const errors: Record<string, string> = {};
-    if (!customer.fullName.trim()) errors.fullName = 'Full name is required';
+    if (!customer.fullName.trim()) errors.fullName = 'Please enter your full name';
     if (!customer.phone.trim()) {
       errors.phone = 'Mobile number is required';
-    } else if (!/^(98|97|96)\d{8}$/.test(customer.phone.replace(/\D/g, '')) && customer.phone.length < 10) {
-      errors.phone = 'Enter a valid 10-digit Nepali mobile number (e.g. 9841XXXXXX)';
+    } else if (!/^(98|97|96)\d{8}$/.test(customer.phone.replace(/[\s-]/g, ''))) {
+      errors.phone = 'Please enter a valid 10-digit Nepal mobile number (e.g. 9841XXXXXX)';
     }
-    if (!customer.streetAddress.trim()) errors.streetAddress = 'Delivery address is required';
+    if (!customer.streetAddress.trim()) errors.streetAddress = 'Delivery street address is required';
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleProceedToPayment = async () => {
-    if (!validateDetails()) return;
-
-    const prn = `PRN-${Math.floor(100000 + Math.random() * 900000)}-${Date.now().toString().slice(-4)}`;
-    setCurrentPRN(prn);
+    if (!validateDetails()) {
+      setStep('details');
+      return;
+    }
 
     if (selectedPaymentMethod === 'fonepay_qr') {
-      const generated = await generateFonepayDynamicQR({
-        prn,
-        totalAmount: grandTotal,
-        customer: { fullName: customer.fullName, phone: customer.phone },
-      });
+      const generated = await generateFonepayDynamicQR(grandTotal, 'GEARTRADE Nepal Gear Purchase');
       setQrData(generated);
+      setCurrentPRN(generated.prn);
       setTimeLeft(300);
       setStep('processing_fonepay');
-    } else if (selectedPaymentMethod === 'cod') {
-      finalizeOrder('cod_pending', 'confirmed', undefined, 'CASH_ON_DELIVERY');
+    } else {
+      // Cash on Delivery
+      finishOrder('cod', 'pending', undefined);
     }
-  };
-
-  const finalizeOrder = (
-    paymentStatus: 'verified' | 'cod_pending' | 'pending' | 'failed',
-    orderStatus: 'confirmed' | 'processing' = 'confirmed',
-    fonepayTransactionId?: string,
-    traceId?: string
-  ) => {
-    const newOrder: Order = {
-      id: `ORD-${Date.now().toString().slice(-6)}`,
-      prn: currentPRN || `PRN-${Math.floor(100000 + Math.random() * 900000)}`,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      nepaliDate: getNepaliDateBS(new Date()),
-      customer,
-      items,
-      subtotal,
-      discount,
-      couponCode: appliedCoupon || undefined,
-      deliveryCharge,
-      taxAmount: vatAmount,
-      totalAmount: grandTotal,
-      paymentMethod: selectedPaymentMethod,
-      paymentStatus,
-      orderStatus,
-      fonepayTraceId: traceId || qrData?.traceId,
-      fonepayTransactionId: fonepayTransactionId || `FP-${Math.floor(100000000 + Math.random() * 900000000)}`,
-      merchantPan: '609823412',
-    };
-
-    onOrderComplete(newOrder);
   };
 
   const handleSimulateBankScan = (bankName: string) => {
     setIsSimulatingBankApp(true);
     setTimeout(() => {
       setIsSimulatingBankApp(false);
-      const randomUid = `FP-TXN-${Date.now().toString(36).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
-      finalizeOrder('verified', 'confirmed', randomUid, qrData?.traceId);
-    }, 1200);
+      const traceId = `FP-TRC-${Math.floor(100000 + Math.random() * 900000)}`;
+      finishOrder('fonepay_qr', 'completed', traceId, bankName);
+    }, 1500);
+  };
+
+  const finishOrder = (
+    method: PaymentMethodType,
+    payStatus: 'pending' | 'completed',
+    fonepayTrace?: string,
+    bankName?: string
+  ) => {
+    const trackingCode = `GT-NP-${Math.floor(100000 + Math.random() * 900000)}`;
+    const newOrder: Order = {
+      id: `ORD-${Date.now()}`,
+      trackingCode,
+      createdAt: new Date().toISOString(),
+      nepaliDateBS: getNepaliDateBS(),
+      items: [...items],
+      customerDetails: { ...customer },
+      paymentMethod: method,
+      paymentStatus: payStatus,
+      fonepayTraceId: fonepayTrace,
+      fonepayBankName: bankName,
+      subtotal,
+      discount,
+      deliveryCharge,
+      vatAmount,
+      grandTotal,
+      orderStatus: 'order_placed',
+      estimatedDeliveryDays: currentProvince.estimatedDays,
+    };
+
+    onOrderComplete(newOrder);
+    onClose();
   };
 
   const handleCopyPRN = () => {
@@ -198,58 +192,76 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
-  const formatTimer = (secs: number) => {
-    const m = Math.floor(secs / 60);
-    const s = secs % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  const formatTimer = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-xs animate-fadeIn font-sans">
       <div
-        className="w-full max-w-2xl bg-white text-stone-900 rounded-2xl shadow-xl border border-stone-200 overflow-hidden relative"
+        className="bg-white dark:bg-stone-950 w-full max-w-2xl shadow-2xl border border-stone-200 dark:border-stone-800 overflow-hidden flex flex-col max-h-[92vh] animate-scaleUp text-stone-900 dark:text-stone-100"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Minimal Header */}
-        <div className="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
-          <div>
-            <h2 className="font-extrabold text-base text-stone-900 tracking-tight">
-              {step === 'details' && 'Delivery Information'}
-              {step === 'payment_method' && 'Select Payment Method'}
-              {step === 'processing_fonepay' && 'Fonepay QR Payment'}
-            </h2>
-            <p className="text-xs text-stone-500">
-              {step === 'details' && 'Enter your address for delivery across Nepal'}
-              {step === 'payment_method' && 'Choose your preferred payment method'}
-              {step === 'processing_fonepay' && 'Scan with any mobile banking app to complete order'}
-            </p>
+        {/* Modal Top Bar */}
+        <div className="px-6 py-4 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between bg-white dark:bg-stone-950">
+          <div className="flex items-center gap-3">
+            <GeartradeLogo variant="full" theme="auto" size="sm" />
+            <span className="text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+              | Checkout
+            </span>
           </div>
 
           <button
             onClick={onClose}
-            className="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-100 rounded-lg transition-colors cursor-pointer"
+            className="p-1.5 text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Body */}
-        <div className="p-6">
-          {/* STEP 1: CUSTOMER & DELIVERY DETAILS */}
+        {/* Progress Step Indicator */}
+        <div className="px-6 py-3 bg-stone-50 dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">
+          <div className={`flex items-center gap-2 ${step === 'details' ? 'text-black dark:text-white font-black' : ''}`}>
+            <span className={`w-5 h-5 flex items-center justify-center border text-[10px] ${step === 'details' ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black' : 'border-stone-300 dark:border-stone-700'}`}>
+              1
+            </span>
+            <span>Delivery</span>
+          </div>
+          <span>→</span>
+          <div className={`flex items-center gap-2 ${step === 'payment_method' ? 'text-black dark:text-white font-black' : ''}`}>
+            <span className={`w-5 h-5 flex items-center justify-center border text-[10px] ${step === 'payment_method' ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black' : 'border-stone-300 dark:border-stone-700'}`}>
+              2
+            </span>
+            <span>Payment</span>
+          </div>
+          <span>→</span>
+          <div className={`flex items-center gap-2 ${step === 'processing_fonepay' ? 'text-black dark:text-white font-black' : ''}`}>
+            <span className={`w-5 h-5 flex items-center justify-center border text-[10px] ${step === 'processing_fonepay' ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black' : 'border-stone-300 dark:border-stone-700'}`}>
+              3
+            </span>
+            <span>Confirm</span>
+          </div>
+        </div>
+
+        {/* Body Content */}
+        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+          {/* STEP 1: CUSTOMER DETAILS */}
           {step === 'details' && (
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Full Name */}
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Full Name <span className="text-[#DE4B56]">*</span>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                    Full Name <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={customer.fullName}
                     onChange={(e) => setCustomer({ ...customer, fullName: e.target.value })}
                     placeholder="e.g. Abhishek Basnet"
-                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#102A45] focus:bg-white"
+                    className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs px-3.5 py-2.5 focus:outline-none focus:border-black dark:focus:border-white font-medium uppercase"
                   />
                   {formErrors.fullName && (
                     <p className="text-[10px] text-rose-500 mt-1">{formErrors.fullName}</p>
@@ -258,11 +270,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                 {/* Nepal Mobile Number */}
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Nepal Mobile Number <span className="text-[#DE4B56]">*</span>
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                    Nepal Mobile Number <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs font-bold">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500 text-xs font-bold">
                       +977
                     </span>
                     <input
@@ -270,7 +282,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       value={customer.phone}
                       onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
                       placeholder="98XXXXXXXX"
-                      className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs rounded-xl pl-14 pr-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#102A45] focus:bg-white"
+                      className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs pl-14 pr-3.5 py-2.5 focus:outline-none focus:border-black dark:focus:border-white font-medium font-mono"
                     />
                   </div>
                   {formErrors.phone && (
@@ -280,7 +292,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                 {/* Email Address */}
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
                     Email Address <span className="text-stone-400 font-normal">(Optional)</span>
                   </label>
                   <input
@@ -288,19 +300,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     value={customer.email}
                     onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
                     placeholder="name@example.com"
-                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#102A45] focus:bg-white"
+                    className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs px-3.5 py-2.5 focus:outline-none focus:border-black dark:focus:border-white font-medium"
                   />
                 </div>
 
                 {/* Province Selection */}
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Province <span className="text-[#DE4B56]">*</span>
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                    Province <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={customer.provinceId}
                     onChange={(e) => setCustomer({ ...customer, provinceId: Number(e.target.value) })}
-                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#102A45] focus:bg-white"
+                    className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs px-3.5 py-2.5 focus:outline-none focus:border-black dark:focus:border-white font-medium"
                   >
                     {NEPAL_PROVINCES.map((prov) => (
                       <option key={prov.id} value={prov.id}>
@@ -312,13 +324,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                 {/* District Selection */}
                 <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    District <span className="text-[#DE4B56]">*</span>
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                    District <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={customer.district}
                     onChange={(e) => setCustomer({ ...customer, district: e.target.value })}
-                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#102A45] focus:bg-white"
+                    className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs px-3.5 py-2.5 focus:outline-none focus:border-black dark:focus:border-white font-medium"
                   >
                     {currentProvince.districts.map((dist) => (
                       <option key={dist} value={dist}>
@@ -329,16 +341,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
 
                 {/* Street Address / Landmark */}
-                <div>
-                  <label className="block text-xs font-semibold text-stone-700 mb-1">
-                    Street Address / Landmark <span className="text-[#DE4B56]">*</span>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 uppercase tracking-wider mb-1">
+                    Street Address / Landmark <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={customer.streetAddress}
                     onChange={(e) => setCustomer({ ...customer, streetAddress: e.target.value })}
                     placeholder="e.g. New Baneshwor, near Nabil Bank"
-                    className="w-full bg-stone-50 border border-stone-300 text-stone-900 text-xs rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#102A45] focus:bg-white"
+                    className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs px-3.5 py-2.5 focus:outline-none focus:border-black dark:focus:border-white font-medium uppercase"
                   />
                   {formErrors.streetAddress && (
                     <p className="text-[10px] text-rose-500 mt-1">{formErrors.streetAddress}</p>
@@ -347,13 +359,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
 
               {/* Order Summary Snapshot */}
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-4 flex items-center justify-between text-xs mt-2">
+              <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 flex items-center justify-between text-xs mt-2">
                 <div>
-                  <span className="text-stone-500">Total Payable: </span>
-                  <span className="text-[#102A45] font-extrabold text-base ml-1">
+                  <span className="text-stone-500 dark:text-stone-400 uppercase tracking-wider text-[10px]">Total Payable: </span>
+                  <span className="text-black dark:text-white font-black text-base ml-1">
                     {formatNPR(grandTotal)}
                   </span>
-                  <span className="text-stone-400 text-[11px] ml-1">({items.length} items)</span>
+                  <span className="text-stone-400 dark:text-stone-500 text-[11px] ml-1">({items.length} items)</span>
                 </div>
                 <button
                   type="button"
@@ -362,7 +374,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       setStep('payment_method');
                     }
                   }}
-                  className="px-5 py-2.5 bg-[#102A45] hover:bg-[#162B4D] text-white font-bold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-xs"
+                  className="px-5 py-2.5 bg-black dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-black font-bold uppercase tracking-wider transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-xs"
                 >
                   <span>Continue to Payment</span>
                   <ArrowRight className="w-4 h-4" />
@@ -378,30 +390,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 {/* 1. Fonepay QR */}
                 <div
                   onClick={() => setSelectedPaymentMethod('fonepay_qr')}
-                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                  className={`p-4 border transition-all cursor-pointer flex items-center justify-between ${
                     selectedPaymentMethod === 'fonepay_qr'
-                      ? 'border-[#102A45] bg-stone-50'
-                      : 'border-stone-200 bg-white hover:border-stone-300'
+                      ? 'border-black dark:border-white bg-stone-50 dark:bg-stone-900 ring-1 ring-black dark:ring-white'
+                      : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 hover:border-stone-400'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 text-[#102A45] flex items-center justify-center font-bold text-sm">
+                    <div className="w-10 h-10 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-black dark:text-white flex items-center justify-center font-bold text-sm">
                       <QrCode className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="font-bold text-xs sm:text-sm text-stone-900">
-                        Fonepay QR Payment
+                      <span className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 uppercase tracking-wider">
+                        Fonepay Dynamic QR
                       </span>
-                      <p className="text-xs text-stone-500 mt-0.5">
-                        Pay with any Nepali mobile banking app or digital wallet via QR scan.
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-light">
+                        Pay with any Nepali mobile banking app or digital wallet via instant QR scan.
                       </p>
                     </div>
                   </div>
                   <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                    className={`w-5 h-5 border flex items-center justify-center ${
                       selectedPaymentMethod === 'fonepay_qr'
-                        ? 'border-[#102A45] bg-[#102A45] text-white'
-                        : 'border-stone-300'
+                        ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
+                        : 'border-stone-300 dark:border-stone-700'
                     }`}
                   >
                     {selectedPaymentMethod === 'fonepay_qr' && <Check className="w-3 h-3" />}
@@ -411,30 +423,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 {/* 2. Cash on Delivery (COD) */}
                 <div
                   onClick={() => setSelectedPaymentMethod('cod')}
-                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${
+                  className={`p-4 border transition-all cursor-pointer flex items-center justify-between ${
                     selectedPaymentMethod === 'cod'
-                      ? 'border-[#102A45] bg-stone-50'
-                      : 'border-stone-200 bg-white hover:border-stone-300'
+                      ? 'border-black dark:border-white bg-stone-50 dark:bg-stone-900 ring-1 ring-black dark:ring-white'
+                      : 'border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-950 hover:border-stone-400'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 flex items-center justify-center font-bold text-sm">
+                    <div className="w-10 h-10 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-700 dark:text-stone-300 flex items-center justify-center font-bold text-sm">
                       <Banknote className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="font-bold text-xs sm:text-sm text-stone-900">
+                      <span className="font-bold text-xs sm:text-sm text-stone-900 dark:text-stone-100 uppercase tracking-wider">
                         Cash on Delivery (COD)
                       </span>
-                      <p className="text-xs text-stone-500 mt-0.5">
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5 font-light">
                         Pay cash to the delivery rider when your package arrives at your doorstep.
                       </p>
                     </div>
                   </div>
                   <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                    className={`w-5 h-5 border flex items-center justify-center ${
                       selectedPaymentMethod === 'cod'
-                        ? 'border-[#102A45] bg-[#102A45] text-white'
-                        : 'border-stone-300'
+                        ? 'border-black dark:border-white bg-black dark:bg-white text-white dark:text-black'
+                        : 'border-stone-300 dark:border-stone-700'
                     }`}
                   >
                     {selectedPaymentMethod === 'cod' && <Check className="w-3 h-3" />}
@@ -443,17 +455,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
 
               {/* Order Amount Summary */}
-              <div className="bg-stone-50 border border-stone-200 rounded-xl p-3.5 flex items-center justify-between text-xs">
-                <span className="text-stone-600">Grand Total Payable:</span>
-                <span className="font-black text-sm text-[#102A45]">{formatNPR(grandTotal)}</span>
+              <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-3.5 flex items-center justify-between text-xs font-medium">
+                <span className="text-stone-600 dark:text-stone-400 uppercase tracking-wider text-[11px]">Grand Total Payable:</span>
+                <span className="font-black text-sm text-black dark:text-white">{formatNPR(grandTotal)}</span>
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-2 border-t border-stone-100">
+              <div className="flex items-center justify-between pt-2 border-t border-stone-200 dark:border-stone-800">
                 <button
                   type="button"
                   onClick={() => setStep('details')}
-                  className="px-3 py-2 text-xs font-semibold text-stone-600 hover:text-stone-900 flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-400 hover:text-black dark:hover:text-white flex items-center gap-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back to Address</span>
@@ -462,7 +474,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <button
                   type="button"
                   onClick={handleProceedToPayment}
-                  className="px-6 py-2.5 bg-[#102A45] hover:bg-[#162B4D] text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-2.5 bg-black dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-black font-bold uppercase tracking-wider text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                 >
                   <span>
                     {selectedPaymentMethod === 'fonepay_qr' ? 'Generate QR & Pay' : 'Confirm Order'}
@@ -478,18 +490,18 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <div className="space-y-5 animate-fadeIn">
               <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
                 {/* QR Code Container */}
-                <div className="md:col-span-6 bg-stone-50 p-5 rounded-2xl border border-stone-200 text-stone-900 text-center space-y-3">
-                  <div className="flex items-center justify-between border-b border-stone-200 pb-2">
-                    <span className="font-bold text-xs text-stone-800">
+                <div className="md:col-span-6 bg-stone-50 dark:bg-stone-900 p-5 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 text-center space-y-3">
+                  <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-2">
+                    <span className="font-bold text-xs uppercase tracking-wider text-stone-800 dark:text-stone-200">
                       Fonepay Dynamic QR
                     </span>
-                    <span className="text-xs text-[#102A45] font-black">
+                    <span className="text-xs text-black dark:text-white font-black">
                       {formatNPR(grandTotal)}
                     </span>
                   </div>
 
                   {/* QR Image */}
-                  <div className="relative mx-auto w-48 h-48 bg-white rounded-xl p-2 border border-stone-200 flex items-center justify-center shadow-xs">
+                  <div className="relative mx-auto w-48 h-48 bg-white p-2 border border-stone-200 dark:border-stone-700 flex items-center justify-center shadow-xs">
                     <img
                       src={qrData.qrDataUrl}
                       alt="Fonepay Dynamic QR"
@@ -498,20 +510,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </div>
 
                   {/* Countdown Timer */}
-                  <div className="flex items-center justify-center gap-1.5 text-xs text-stone-600">
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-stone-600 dark:text-stone-400">
                     <Clock className="w-3.5 h-3.5 text-stone-500" />
                     <span>Valid for: </span>
-                    <span className="font-mono font-bold text-stone-900">
+                    <span className="font-mono font-bold text-black dark:text-white">
                       {formatTimer(timeLeft)}
                     </span>
                   </div>
 
                   {/* PRN Reference */}
-                  <div className="flex items-center justify-between text-[11px] bg-white border border-stone-200 px-3 py-1.5 rounded-lg">
+                  <div className="flex items-center justify-between text-[11px] bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 px-3 py-1.5">
                     <span className="text-stone-500 font-mono text-[10px]">PRN: {qrData.prn}</span>
                     <button
                       onClick={handleCopyPRN}
-                      className="text-stone-700 hover:text-stone-900 font-semibold flex items-center gap-1 cursor-pointer"
+                      className="text-stone-700 dark:text-stone-300 hover:text-black dark:hover:text-white font-semibold flex items-center gap-1 cursor-pointer"
                     >
                       {copiedPRN ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
                       <span>{copiedPRN ? 'Copied' : 'Copy'}</span>
@@ -521,12 +533,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                 {/* Instructions & Simulation */}
                 <div className="md:col-span-6 space-y-3.5">
-                  <div className="bg-stone-50 border border-stone-200 p-4 rounded-xl space-y-2 text-xs">
-                    <h3 className="font-bold text-stone-900 flex items-center gap-1.5">
-                      <Smartphone className="w-4 h-4 text-stone-700" />
+                  <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-4 space-y-2 text-xs">
+                    <h3 className="font-bold text-stone-900 dark:text-stone-100 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                      <Smartphone className="w-4 h-4 text-stone-700 dark:text-stone-300" />
                       <span>How to pay:</span>
                     </h3>
-                    <ol className="list-decimal list-inside text-stone-600 space-y-1 text-[11px] leading-relaxed">
+                    <ol className="list-decimal list-inside text-stone-600 dark:text-stone-400 space-y-1 text-[11px] leading-relaxed font-light">
                       <li>Open any Nepal mobile banking app (Nabil, NIC Asia, Global IME, etc.).</li>
                       <li>Tap the <strong>QR Scan</strong> icon.</li>
                       <li>Scan the QR code shown on screen.</li>
@@ -535,9 +547,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </div>
 
                   {/* Quick Demo Simulator */}
-                  <div className="bg-stone-50 border border-stone-200 p-3.5 rounded-xl space-y-2.5">
+                  <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-3.5 space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-stone-700">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-stone-700 dark:text-stone-300">
                         Demo: Simulate App Payment
                       </span>
                     </div>
@@ -546,42 +558,42 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       <button
                         onClick={() => handleSimulateBankScan('Nabil SmartBank')}
                         disabled={isSimulatingBankApp}
-                        className="p-2 bg-white hover:bg-stone-100 border border-stone-200 rounded-lg text-left text-xs text-stone-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="p-2 bg-white dark:bg-stone-950 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-left text-xs text-stone-800 dark:text-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
                       >
                         <span>🏛️</span>
-                        <span className="font-medium truncate text-[11px]">Nabil Bank</span>
+                        <span className="truncate text-[11px]">Nabil Bank</span>
                       </button>
 
                       <button
                         onClick={() => handleSimulateBankScan('NIC Asia MoBank')}
                         disabled={isSimulatingBankApp}
-                        className="p-2 bg-white hover:bg-stone-100 border border-stone-200 rounded-lg text-left text-xs text-stone-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="p-2 bg-white dark:bg-stone-950 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-left text-xs text-stone-800 dark:text-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
                       >
                         <span>🏦</span>
-                        <span className="font-medium truncate text-[11px]">NIC Asia</span>
+                        <span className="truncate text-[11px]">NIC Asia</span>
                       </button>
 
                       <button
                         onClick={() => handleSimulateBankScan('Global Smart Plus')}
                         disabled={isSimulatingBankApp}
-                        className="p-2 bg-white hover:bg-stone-100 border border-stone-200 rounded-lg text-left text-xs text-stone-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="p-2 bg-white dark:bg-stone-950 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-left text-xs text-stone-800 dark:text-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
                       >
                         <span>💳</span>
-                        <span className="font-medium truncate text-[11px]">Global IME</span>
+                        <span className="truncate text-[11px]">Global IME</span>
                       </button>
 
                       <button
                         onClick={() => handleSimulateBankScan('eSewa Wallet')}
                         disabled={isSimulatingBankApp}
-                        className="p-2 bg-white hover:bg-stone-100 border border-stone-200 rounded-lg text-left text-xs text-stone-800 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        className="p-2 bg-white dark:bg-stone-950 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 text-left text-xs text-stone-800 dark:text-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
                       >
                         <span>🟢</span>
-                        <span className="font-medium truncate text-[11px]">eSewa QR</span>
+                        <span className="truncate text-[11px]">eSewa QR</span>
                       </button>
                     </div>
 
                     {isSimulatingBankApp && (
-                      <div className="flex items-center justify-center gap-2 py-2 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg border border-emerald-200">
+                      <div className="flex items-center justify-center gap-2 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
                         <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                         <span>Verifying transaction...</span>
                       </div>
@@ -591,7 +603,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <div className="flex items-center justify-between text-xs text-stone-500 pt-1">
                     <button
                       onClick={() => setStep('payment_method')}
-                      className="hover:text-stone-900 underline cursor-pointer"
+                      className="hover:text-black dark:hover:text-white underline uppercase tracking-wider text-[10px] cursor-pointer"
                     >
                       Change payment method
                     </button>

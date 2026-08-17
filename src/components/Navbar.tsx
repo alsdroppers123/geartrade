@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { ShoppingBag, Search, MapPin, Heart, PackageCheck, Menu, X, User, HelpCircle, Code2, Sliders, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, Search, MapPin, Heart, PackageCheck, Menu, X, User, Sliders, ShieldCheck, Sun, Moon, ChevronDown, ChevronUp } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { ProductCategory, AuthUser } from '../types';
 import { GeartradeLogo } from './GeartradeLogo';
 import { UserAccountMenu } from './UserAccountMenu';
+import { useTheme } from '../context/ThemeContext';
 
 interface NavbarProps {
   cartCount: number;
@@ -39,97 +41,178 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
+  const { theme, isDark, toggleTheme } = useTheme();
+
+  // Auto-hide the announcement bar after 20 seconds
+  useEffect(() => {
+    if (!isAnnouncementVisible) return;
+    const timer = setTimeout(() => {
+      setIsAnnouncementVisible(false);
+    }, 20000);
+
+    return () => clearTimeout(timer);
+  }, [isAnnouncementVisible]);
 
   const navCategories: { id: ProductCategory; label: string }[] = [
-    { id: 'all', label: 'All Gear' },
-    { id: 'mens', label: "Men's" },
-    { id: 'womens', label: "Women's" },
-    { id: 'kids', label: "Kids'" },
-    { id: 'bags_gears', label: 'Bags & Gears' },
-    { id: 'shoes', label: 'Footwear' },
+    { id: 'all', label: 'ALL GEAR' },
+    { id: 'mens', label: 'MEN' },
+    { id: 'womens', label: 'WOMEN' },
+    { id: 'kids', label: 'KIDS' },
+    { id: 'bags_gears', label: 'BAGS & GEARS' },
+    { id: 'shoes', label: 'FOOTWEAR' },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-stone-200 shadow-xs font-sans">
-      {/* Top Minimal Bar */}
-      <div className="bg-[#102A45] text-slate-300 text-xs px-4 py-1.5 border-b border-slate-800">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-white font-bold text-[11px] tracking-wide">
-              GEARTRADE NEPAL
-            </span>
-            <span className="hidden sm:inline text-slate-400 text-[11px]">
-              • Nationwide Delivery Across 7 Provinces
-            </span>
-          </div>
+    <header className="sticky top-0 z-40 bg-white dark:bg-black border-b border-stone-200 dark:border-stone-800 transition-colors duration-200 font-sans shadow-xs">
+      {/* Top Minimalist Announcement Bar with 20s Auto-Disappear & Drop Slider */}
+      <AnimatePresence initial={false}>
+        {isAnnouncementVisible && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            className="overflow-hidden bg-black dark:bg-stone-950 text-white border-b border-stone-900 dark:border-stone-800 relative group"
+          >
+            <div className="text-[11px] px-4 py-2 tracking-wider transition-colors">
+              <div className="max-w-7xl mx-auto flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="font-bold tracking-widest uppercase text-white">
+                    GEARTRADE NEPAL
+                  </span>
+                  <span className="hidden md:inline text-stone-400 font-light">
+                    — FREE DELIVERY OVER RS. 5,000 ACROSS ALL 7 PROVINCES
+                  </span>
+                </div>
 
-          <div className="flex items-center gap-3 sm:gap-4 text-[11px]">
-            {currentUser?.isAdmin ? (
-              <button
-                onClick={onOpenAdmin}
-                className="hover:bg-[#c93f4a] transition-colors cursor-pointer flex items-center gap-1.5 bg-[#DE4B56] text-white px-2.5 py-0.5 rounded font-bold shadow-xs border border-rose-400/40"
-                title="Admin Logistics & Product Management"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
-                <span>Admin Hub</span>
-              </button>
-            ) : (
-              <button
-                onClick={onOpenAdmin}
-                className="hover:text-white text-slate-400 transition-colors cursor-pointer flex items-center gap-1 bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded font-semibold border border-slate-700"
-                title="Admin Portal (Restricted to Authorized Admins)"
-              >
-                <Sliders className="w-3 h-3 text-slate-400" />
-                <span>Admin</span>
-              </button>
-            )}
-            <span className="text-slate-600">|</span>
-            <button
-              onClick={onOpenTracker}
-              className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-            >
-              <PackageCheck className="w-3.5 h-3.5 text-[#F5A623]" />
-              <span className="hidden sm:inline">Track Order</span>
-            </button>
-            <span className="text-slate-600">|</span>
-            <button
-              onClick={onOpenStoreLocator}
-              className="hover:text-white transition-colors cursor-pointer flex items-center gap-1"
-            >
-              <MapPin className="w-3.5 h-3.5 text-[#DE4B56]" />
-              <span className="hidden sm:inline">Stores</span>
-            </button>
-          </div>
+                <div className="flex items-center gap-3 sm:gap-4 text-[11px] uppercase tracking-wider font-semibold">
+                  {/* Quick Theme Switcher in Top Bar */}
+                  <button
+                    onClick={toggleTheme}
+                    className="flex items-center gap-1.5 px-2 py-0.5 text-stone-300 hover:text-white bg-stone-900/80 hover:bg-stone-800 border border-stone-800 transition-colors cursor-pointer text-[10px] uppercase tracking-wider"
+                    title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    aria-label="Toggle Dark/Light Mode"
+                  >
+                    {isDark ? (
+                      <>
+                        <Sun className="w-3 h-3 text-amber-400" />
+                        <span className="hidden sm:inline">LIGHT</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="w-3 h-3 text-stone-300" />
+                        <span className="hidden sm:inline">DARK</span>
+                      </>
+                    )}
+                  </button>
+
+                  <span className="text-stone-700">|</span>
+
+                  {currentUser?.isAdmin ? (
+                    <button
+                      onClick={onOpenAdmin}
+                      className="hover:text-stone-200 transition-colors cursor-pointer flex items-center gap-1 text-white bg-stone-900 border border-stone-700 px-2 py-0.5 text-[10px]"
+                      title="Admin Management Hub"
+                    >
+                      <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                      <span>Admin Hub</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={onOpenAdmin}
+                      className="text-stone-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1 text-[10px]"
+                      title="Admin Access"
+                    >
+                      <Sliders className="w-2.5 h-2.5" />
+                      <span>Admin</span>
+                    </button>
+                  )}
+                  <span className="text-stone-700">|</span>
+                  <button
+                    onClick={onOpenTracker}
+                    className="text-stone-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <PackageCheck className="w-3 h-3" />
+                    <span className="hidden sm:inline">Track Order</span>
+                  </button>
+                  <span className="text-stone-700">|</span>
+                  <button
+                    onClick={onOpenStoreLocator}
+                    className="text-stone-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <MapPin className="w-3 h-3" />
+                    <span className="hidden sm:inline">Stores</span>
+                  </button>
+
+                  {/* Manual Collapse Handle */}
+                  <span className="text-stone-700">|</span>
+                  <button
+                    onClick={() => setIsAnnouncementVisible(false)}
+                    className="text-stone-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1 px-1 py-0.5 hover:bg-stone-900 rounded-xs"
+                    title="Slide up & hide announcement bar"
+                    aria-label="Hide announcement bar"
+                  >
+                    <ChevronUp className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Subtle 20s Countdown Progress Indicator Bar */}
+            <motion.div
+              initial={{ scaleX: 1 }}
+              animate={{ scaleX: 0 }}
+              transition={{ duration: 20, ease: 'linear' }}
+              style={{ originX: 0 }}
+              className="h-[1.5px] bg-gradient-to-r from-amber-400/80 via-white/80 to-amber-400/80 w-full opacity-40 group-hover:opacity-80 transition-opacity"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Small Drop Slider Pull-Down Tab (Appears when bar is hidden) */}
+      {!isAnnouncementVisible && (
+        <div className="relative flex justify-center w-full pointer-events-none">
+          <button
+            onClick={() => setIsAnnouncementVisible(true)}
+            className="pointer-events-auto absolute top-0 -translate-y-0.5 z-50 flex items-center gap-1 px-3 py-0.5 bg-black dark:bg-stone-900 text-stone-300 hover:text-white text-[9px] font-bold uppercase tracking-widest border-b border-x border-stone-800 shadow-md hover:bg-stone-900 transition-all cursor-pointer rounded-b-sm group"
+            title="Drop down announcements & quick links"
+            aria-label="Drop down announcement bar"
+          >
+            <span>OFFERS & NOTICE</span>
+            <ChevronDown className="w-3 h-3 text-amber-400 group-hover:translate-y-0.5 transition-transform" />
+          </button>
         </div>
-      </div>
+      )}
 
-      {/* Main Header */}
+      {/* Main Header Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-6">
         {/* Brand Logo */}
         <div
           onClick={() => onSelectCategory('all')}
-          className="cursor-pointer flex items-center gap-2 shrink-0"
+          className="cursor-pointer flex items-center gap-2 shrink-0 group"
         >
-          <GeartradeLogo variant="full" size="md" />
+          <GeartradeLogo variant="full" theme="auto" size="md" />
         </div>
 
-        {/* Minimal Category Tabs */}
-        <nav className="hidden md:flex items-center space-x-1 lg:space-x-4">
+        {/* Minimal Category Links */}
+        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
           {navCategories.map((cat) => {
             const isActive = selectedCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => onSelectCategory(cat.id)}
-                className={`relative px-3 py-1.5 text-xs lg:text-sm font-bold tracking-wider uppercase transition-colors cursor-pointer ${
+                className={`relative py-1.5 text-xs font-bold tracking-[0.14em] uppercase transition-all cursor-pointer ${
                   isActive
-                    ? 'text-[#102A45]'
-                    : 'text-stone-500 hover:text-stone-900'
+                    ? 'text-black dark:text-white font-black'
+                    : 'text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white'
                 }`}
               >
                 {cat.label}
                 {isActive && (
-                  <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-[#102A45] rounded-full" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-black dark:bg-white" />
                 )}
               </button>
             );
@@ -137,60 +220,74 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-3 shrink-0">
-          {/* Search Input */}
-          <div className="relative hidden xl:block w-52">
+        <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+          {/* Minimal Search Input */}
+          <div className="relative hidden xl:block w-56">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search gear..."
-              className="w-full bg-stone-100 border border-stone-200 text-stone-900 placeholder-stone-400 text-xs rounded-full pl-8 pr-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#102A45] focus:bg-white transition-all"
+              placeholder="SEARCH GEAR..."
+              className="w-full bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 text-stone-900 dark:text-stone-100 placeholder-stone-400 dark:placeholder-stone-500 text-[11px] font-medium tracking-wider pl-8 pr-3 py-1.5 focus:outline-none focus:border-black dark:focus:border-white transition-all uppercase"
             />
-            <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-stone-400 dark:text-stone-500 absolute left-2.5 top-1/2 -translate-y-1/2" />
             {searchQuery && (
               <button
                 onClick={() => onSearchChange('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 text-[10px] bg-stone-200 px-1.5 py-0.5 rounded-full"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-black dark:hover:text-white text-[10px]"
               >
                 ✕
               </button>
             )}
           </div>
 
-          {/* Search button for smaller screens */}
+          {/* Search Trigger for Mobile/Tablet */}
           <button
             onClick={() => setShowSearchModal(!showSearchModal)}
-            className="p-2 text-stone-600 hover:text-[#102A45] hover:bg-stone-100 rounded-full transition-colors xl:hidden cursor-pointer"
+            className="p-2 text-stone-700 dark:text-stone-300 hover:text-black dark:hover:text-white transition-colors xl:hidden cursor-pointer"
             aria-label="Search"
           >
-            <Search className="w-5 h-5" />
+            <Search className="w-4 h-4" />
+          </button>
+
+          {/* Theme Switcher Button Icon */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 text-stone-700 dark:text-stone-300 hover:text-black dark:hover:text-white hover:bg-stone-100 dark:hover:bg-stone-900 transition-colors cursor-pointer border border-transparent hover:border-stone-200 dark:hover:border-stone-800"
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle Light and Dark Mode"
+          >
+            {isDark ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-stone-800" />
+            )}
           </button>
 
           {/* Wishlist Button */}
           <button
             onClick={onOpenWishlist}
-            className="p-2 text-stone-600 hover:text-[#DE4B56] hover:bg-stone-100 rounded-full transition-colors relative cursor-pointer"
+            className="p-2 text-stone-700 dark:text-stone-300 hover:text-black dark:hover:text-white transition-colors relative cursor-pointer"
             title="Saved Items"
             aria-label="Wishlist"
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-4 h-4" />
             {wishlistCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 bg-[#DE4B56] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-0.5 right-0.5 bg-black dark:bg-white text-white dark:text-black text-[9px] font-black w-3.5 h-3.5 flex items-center justify-center">
                 {wishlistCount}
               </span>
             )}
           </button>
 
-          {/* Shopping Bag Button */}
+          {/* Minimal Shopping Bag Button */}
           <button
             onClick={onOpenCart}
-            className="flex items-center gap-2 bg-[#102A45] hover:bg-[#162B4D] text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer"
+            className="flex items-center gap-2 bg-black dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-black px-3.5 py-2 text-xs font-bold tracking-wider uppercase transition-all shadow-xs cursor-pointer"
           >
-            <ShoppingBag className="w-4 h-4" />
+            <ShoppingBag className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Bag</span>
-            <span className="bg-[#DE4B56] text-white text-xs font-black px-1.5 py-0.2 rounded-full">
-              {cartCount}
+            <span className="text-[11px] font-black">
+              ({cartCount})
             </span>
           </button>
 
@@ -207,28 +304,28 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 text-stone-700 hover:text-black md:hidden cursor-pointer"
+            className="p-2 text-stone-800 dark:text-stone-200 hover:text-black dark:hover:text-white lg:hidden cursor-pointer"
             aria-label="Toggle navigation menu"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
       </div>
 
       {/* Mobile Search Overlay */}
       {showSearchModal && (
-        <div className="p-3 bg-stone-50 border-t border-stone-200 xl:hidden flex gap-2">
+        <div className="p-3 bg-stone-50 dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 xl:hidden flex gap-2">
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search gear by name, category or style code..."
-            className="flex-1 bg-white border border-stone-300 text-stone-900 text-xs rounded-xl px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#102A45]"
+            className="flex-1 bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs px-3 py-2 focus:outline-none focus:border-black dark:focus:border-white uppercase font-medium"
             autoFocus
           />
           <button
             onClick={() => setShowSearchModal(false)}
-            className="px-3 py-2 bg-stone-200 text-stone-700 text-xs font-bold rounded-xl"
+            className="px-3 py-2 bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-bold cursor-pointer"
           >
             Close
           </button>
@@ -237,8 +334,8 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-stone-200 px-4 py-4 space-y-3">
-          <div className="grid grid-cols-2 gap-2">
+        <div className="lg:hidden bg-white dark:bg-stone-950 border-t border-stone-200 dark:border-stone-800 px-5 py-4 space-y-4 shadow-xl">
+          <div className="space-y-1">
             {navCategories.map((cat) => (
               <button
                 key={cat.id}
@@ -246,43 +343,60 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onSelectCategory(cat.id);
                   setMobileMenuOpen(false);
                 }}
-                className={`p-2.5 rounded-xl text-left text-xs font-bold transition-colors ${
+                className={`w-full py-2.5 text-left text-xs font-bold tracking-wider uppercase transition-colors flex items-center justify-between cursor-pointer ${
                   selectedCategory === cat.id
-                    ? 'bg-[#102A45] text-white'
-                    : 'bg-stone-50 text-stone-800 hover:bg-stone-100'
+                    ? 'text-black dark:text-white font-black border-l-2 border-black dark:border-white pl-2'
+                    : 'text-stone-600 dark:text-stone-400 hover:text-black dark:hover:text-white'
                 }`}
               >
-                {cat.label}
+                <span>{cat.label}</span>
+                <span>→</span>
               </button>
             ))}
           </div>
 
-          <div className="pt-2 border-t border-stone-100 flex flex-col gap-2 text-xs">
+          <div className="pt-3 border-t border-stone-200 dark:border-stone-800 flex flex-col gap-2.5 text-xs">
+            {/* Theme toggle in mobile menu */}
+            <div className="flex items-center justify-between p-2.5 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800">
+              <span className="font-bold text-xs uppercase tracking-wider text-stone-800 dark:text-stone-200">
+                DISPLAY THEME
+              </span>
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-2 px-3 py-1 bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-xs font-bold uppercase tracking-wider cursor-pointer"
+              >
+                {isDark ? (
+                  <>
+                    <Sun className="w-3.5 h-3.5 text-amber-400" />
+                    <span>DARK MODE</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-3.5 h-3.5 text-stone-800" />
+                    <span>LIGHT MODE</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Mobile User Profile / Login */}
             {currentUser ? (
-              <div className="p-3 bg-stone-100 rounded-xl flex items-center justify-between">
+              <div className="p-3 bg-stone-100 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   {currentUser.picture ? (
                     <img
                       src={currentUser.picture}
                       alt={currentUser.name}
-                      className="w-8 h-8 rounded-full object-cover border border-stone-300"
+                      className="w-7 h-7 object-cover border border-stone-300 dark:border-stone-700"
                     />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-slate-800 text-white font-bold flex items-center justify-center text-xs">
+                    <div className="w-7 h-7 bg-stone-900 dark:bg-white text-white dark:text-black font-bold flex items-center justify-center text-xs">
                       {currentUser.name.charAt(0)}
                     </div>
                   )}
                   <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-stone-900 text-xs">{currentUser.name}</span>
-                      {currentUser.isAdmin && (
-                        <span className="bg-emerald-600 text-white text-[9px] font-black px-1.5 py-0.2 rounded uppercase">
-                          Admin
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] text-stone-500 font-mono block truncate max-w-[170px]">
+                    <span className="font-bold text-stone-900 dark:text-white text-xs block">{currentUser.name}</span>
+                    <span className="text-[10px] text-stone-500 font-mono block truncate max-w-[160px]">
                       {currentUser.email}
                     </span>
                   </div>
@@ -292,7 +406,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-stone-500 hover:text-rose-600 font-semibold text-xs px-2 py-1"
+                  className="text-stone-500 dark:text-stone-400 hover:text-black dark:hover:text-white font-semibold text-xs px-2 py-1 cursor-pointer"
                 >
                   Logout
                 </button>
@@ -303,27 +417,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onOpenLoginModal();
                   setMobileMenuOpen(false);
                 }}
-                className="w-full py-2.5 px-3 bg-[#102A45] hover:bg-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                className="w-full py-2.5 px-3 bg-black dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-black font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs cursor-pointer"
               >
-                {/* Google Mini Icon */}
-                <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"
-                  />
-                </svg>
                 <span>Sign in with Google</span>
               </button>
             )}
@@ -333,28 +428,26 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onOpenAdmin();
                 setMobileMenuOpen(false);
               }}
-              className={`flex items-center justify-between p-2.5 text-white rounded-xl font-bold ${
-                currentUser?.isAdmin ? 'bg-[#DE4B56]' : 'bg-[#102A45]'
-              }`}
+              className="flex items-center justify-between p-2.5 text-white bg-stone-900 dark:bg-stone-900 border border-stone-800 font-bold text-xs uppercase tracking-wider cursor-pointer"
             >
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-[#F5A623]" />
+                <Sliders className="w-3.5 h-3.5" />
                 <span>Admin Hub & Logistics</span>
               </div>
-              <span className="text-[10px] bg-black/30 px-1.5 py-0.5 rounded font-black">
+              <span className="text-[9px] bg-white/20 px-1.5 py-0.5 font-black">
                 {currentUser?.isAdmin ? 'AUTHORIZED' : 'RESTRICTED'}
               </span>
             </button>
 
-            <div className="flex items-center justify-between text-xs text-stone-600 px-1">
+            <div className="flex items-center justify-between text-xs text-stone-600 dark:text-stone-400 pt-2">
               <button
                 onClick={() => {
                   onOpenTracker();
                   setMobileMenuOpen(false);
                 }}
-                className="flex items-center gap-1.5 font-bold text-stone-800"
+                className="flex items-center gap-1 font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider text-[11px] cursor-pointer"
               >
-                <PackageCheck className="w-4 h-4 text-[#F5A623]" />
+                <PackageCheck className="w-3.5 h-3.5" />
                 <span>Track Order</span>
               </button>
               <button
@@ -362,9 +455,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onOpenStoreLocator();
                   setMobileMenuOpen(false);
                 }}
-                className="flex items-center gap-1.5 font-bold text-stone-800"
+                className="flex items-center gap-1 font-bold text-stone-800 dark:text-stone-200 uppercase tracking-wider text-[11px] cursor-pointer"
               >
-                <MapPin className="w-4 h-4 text-[#DE4B56]" />
+                <MapPin className="w-3.5 h-3.5" />
                 <span>Store Locations</span>
               </button>
             </div>
