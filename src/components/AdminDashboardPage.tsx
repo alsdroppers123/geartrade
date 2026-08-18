@@ -50,7 +50,8 @@ import {
   FileText,
   CheckSquare,
   Square,
-  Navigation
+  Navigation,
+  Copy,
 } from 'lucide-react';
 import {
   Product,
@@ -68,7 +69,13 @@ import {
 import { formatNPR } from '../services/fonepayService';
 import { INITIAL_PRODUCTS } from '../data/products';
 import { NEPAL_PROVINCES } from '../data/nepalLocations';
-import { getAdminWhitelist, addAdminEmail, removeAdminEmail } from '../services/authService';
+import {
+  getAdminWhitelist,
+  addAdminEmail,
+  removeAdminEmail,
+  getGoogleClientId,
+  saveGoogleClientId,
+} from '../services/authService';
 import { AdminAccessGate } from './AdminAccessGate';
 import { GeartradeLogo } from './GeartradeLogo';
 import { DeleteConfirmModal } from './admin/DeleteConfirmModal';
@@ -156,6 +163,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const [newAdminEmailInput, setNewAdminEmailInput] = useState('');
   const [newAdminNoteInput, setNewAdminNoteInput] = useState('');
   const [adminEmailToRevoke, setAdminEmailToRevoke] = useState<string | null>(null);
+  const [adminClientIdInput, setAdminClientIdInput] = useState(() => getGoogleClientId());
+  const [copiedOriginInAdmin, setCopiedOriginInAdmin] = useState(false);
 
   // Product & Merchandising State
   const [searchFilter, setSearchFilter] = useState('');
@@ -2677,6 +2686,95 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Google OAuth Production Settings */}
+              <div className="bg-stone-950 p-6 border border-stone-800 space-y-4">
+                <div className="pb-4 border-b border-stone-800">
+                  <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-stone-400">
+                    AUTHENTICATION INFRASTRUCTURE
+                  </span>
+                  <h2 className="text-base font-black uppercase tracking-wider text-white mt-0.5 flex items-center gap-2">
+                    <Key className="w-4 h-4 text-amber-400" />
+                    <span>GOOGLE OAUTH 2.0 PRODUCTION CLIENT ID</span>
+                  </h2>
+                  <p className="text-xs text-stone-400 mt-0.5 font-light">
+                    Connect your Google Cloud OAuth Client ID for live popup authentication with real Google accounts.
+                  </p>
+                </div>
+
+                <div className="p-3.5 bg-stone-900/60 border border-stone-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">
+                      Authorized JavaScript Origin URL
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof navigator !== 'undefined') {
+                          navigator.clipboard.writeText(window.location.origin);
+                          setCopiedOriginInAdmin(true);
+                          setTimeout(() => setCopiedOriginInAdmin(false), 2500);
+                        }
+                      }}
+                      className="flex items-center gap-1 px-2 py-0.5 bg-white text-black text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                    >
+                      {copiedOriginInAdmin ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      <span>{copiedOriginInAdmin ? 'Copied' : 'Copy URL'}</span>
+                    </button>
+                  </div>
+                  <div className="p-2 bg-stone-950 border border-stone-800 font-mono text-xs text-stone-300 select-all break-all">
+                    {typeof window !== 'undefined' ? window.location.origin : ''}
+                  </div>
+                </div>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    saveGoogleClientId(adminClientIdInput);
+                    showAdminToast(
+                      adminClientIdInput.trim()
+                        ? 'Google OAuth Client ID saved successfully!'
+                        : 'Google OAuth Client ID removed.'
+                    );
+                  }}
+                  className="space-y-3"
+                >
+                  <div>
+                    <label className="block text-[10px] uppercase font-bold text-stone-400 mb-1 tracking-wider">
+                      GOOGLE CLIENT ID (FROM GOOGLE CLOUD CONSOLE)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 1234567890-abcdefg.apps.googleusercontent.com"
+                      value={adminClientIdInput}
+                      onChange={(e) => setAdminClientIdInput(e.target.value)}
+                      className="w-full px-3 py-2 bg-stone-900 border border-stone-800 text-white text-xs font-mono"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      className="px-5 py-2 bg-white hover:bg-stone-200 text-black text-xs font-black uppercase tracking-wider cursor-pointer"
+                    >
+                      SAVE GOOGLE CLIENT ID
+                    </button>
+                    {adminClientIdInput && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAdminClientIdInput('');
+                          saveGoogleClientId('');
+                          showAdminToast('Google Client ID cleared.');
+                        }}
+                        className="px-4 py-2 bg-stone-900 hover:bg-stone-800 text-stone-400 text-xs font-bold uppercase tracking-wider border border-stone-800 cursor-pointer"
+                      >
+                        CLEAR
+                      </button>
+                    )}
+                  </div>
+                </form>
               </div>
             </div>
           )}

@@ -2,6 +2,51 @@ import { AuthUser, AdminWhitelistEntry } from '../types';
 
 const AUTH_USER_KEY = 'geartrade_auth_user';
 const ADMIN_WHITELIST_KEY = 'geartrade_admin_whitelist';
+const GOOGLE_CLIENT_ID_KEY = 'geartrade_google_client_id';
+
+export function getGoogleClientId(): string {
+  try {
+    const saved = localStorage.getItem(GOOGLE_CLIENT_ID_KEY);
+    if (
+      saved &&
+      typeof saved === 'string' &&
+      saved.trim().length > 8 &&
+      saved.trim() !== 'undefined' &&
+      saved.trim() !== 'null' &&
+      !saved.includes('MY_') &&
+      !saved.includes('YOUR_')
+    ) {
+      return saved.trim();
+    }
+    const envId = (import.meta as any)?.env?.VITE_GOOGLE_CLIENT_ID;
+    if (
+      envId &&
+      typeof envId === 'string' &&
+      envId.trim().length > 8 &&
+      envId.trim() !== 'undefined' &&
+      envId.trim() !== 'null' &&
+      !envId.includes('MY_') &&
+      !envId.includes('YOUR_')
+    ) {
+      return envId.trim();
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+export function saveGoogleClientId(clientId: string): void {
+  try {
+    if (clientId.trim()) {
+      localStorage.setItem(GOOGLE_CLIENT_ID_KEY, clientId.trim());
+    } else {
+      localStorage.removeItem(GOOGLE_CLIENT_ID_KEY);
+    }
+  } catch (e) {
+    console.error('Failed to save Google Client ID', e);
+  }
+}
 
 // Master admin pre-configured with user's email from environment context
 export const DEFAULT_ADMIN_WHITELIST: AdminWhitelistEntry[] = [
