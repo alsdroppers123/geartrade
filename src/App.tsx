@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroBanner, DEFAULT_HERO_SLIDES } from './components/HeroBanner';
-import { CategoryTiles, DEFAULT_CATEGORY_CARDS } from './components/CategoryTiles';
+import { DEFAULT_CATEGORY_CARDS } from './components/CategoryTiles';
 import { ProductCard } from './components/ProductCard';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartDrawer } from './components/CartDrawer';
@@ -508,23 +508,6 @@ export default function App() {
         }}
       />
 
-      {/* 5 Shop-by-Category Visual Tiles */}
-      <CategoryTiles
-        selectedCategory={selectedCategory}
-        onSelectCategory={(cat) => {
-          setSelectedCategory(cat);
-          const el = document.getElementById('catalog-section');
-          el?.scrollIntoView({ behavior: 'smooth' });
-        }}
-        customCards={categoryCards}
-        isAdmin={Boolean(currentUser?.isAdmin)}
-        onOpenVisualStudio={() => {
-          setAdminInitialTab('visuals');
-          setCurrentView('admin');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-      />
-
       {/* Admin Featured / Curated Showcase Section (if active) */}
       {flashSaleProducts.length > 0 && selectedCategory === 'all' && searchQuery === '' && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 w-full">
@@ -559,7 +542,7 @@ export default function App() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10">
               {flashSaleProducts.slice(0, 4).map((product) => (
-                <div key={product.id} className="bg-white dark:bg-stone-900 p-2 text-stone-900 dark:text-stone-100 border border-transparent dark:border-stone-800">
+                <div key={product.id} className="p-1">
                   <ProductCard
                     product={product}
                     isWishlisted={wishlist.includes(product.id)}

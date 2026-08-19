@@ -33,51 +33,51 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     : 0;
 
   return (
-    <div className="group bg-white dark:bg-stone-950 border border-stone-200 dark:border-stone-800 hover:border-black dark:hover:border-stone-500 transition-all duration-300 flex flex-col overflow-hidden relative font-sans">
+    <div className="group bg-white dark:bg-stone-950 border border-stone-200/90 dark:border-stone-800/90 hover:border-stone-400 dark:hover:border-stone-600 rounded-2xl hover:shadow-xl hover:shadow-stone-900/5 dark:hover:shadow-black/50 hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden relative font-sans">
       {/* Product Image Container */}
       <div
-        className="relative aspect-[3/4] w-full overflow-hidden bg-stone-50 dark:bg-stone-900 cursor-pointer"
+        className="relative aspect-[3/4] w-full overflow-hidden bg-stone-100 dark:bg-stone-900 cursor-pointer"
         onClick={() => onQuickView(product)}
       >
         <img
           src={product.images[0]}
           alt={product.name}
-          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
           loading="lazy"
         />
 
         {/* Minimal Badges */}
-        <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 items-start">
+        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
           {product.badge ? (
-            <span className="bg-black dark:bg-white text-white dark:text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider">
+            <span className="bg-black/90 dark:bg-white/95 text-white dark:text-black text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-xs shadow-xs">
               {product.badge}
             </span>
           ) : product.isNewArrival ? (
-            <span className="bg-black dark:bg-white text-white dark:text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider">
+            <span className="bg-black/90 dark:bg-white/95 text-white dark:text-black text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-xs shadow-xs">
               NEW
             </span>
           ) : product.isBestSeller ? (
-            <span className="bg-stone-900 dark:bg-stone-200 text-white dark:text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-wider">
+            <span className="bg-stone-900/90 dark:bg-stone-100/95 text-white dark:text-black text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider backdrop-blur-xs shadow-xs">
               BESTSELLER
             </span>
           ) : null}
 
           {discountPercent > 0 && (
-            <span className="bg-stone-800 dark:bg-stone-800 text-white text-[9px] font-bold px-2 py-0.5 uppercase">
+            <span className="bg-stone-800/90 dark:bg-stone-800/90 text-white text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase shadow-xs">
               {discountPercent}% OFF
             </span>
           )}
         </div>
 
         {/* Top Right Action Buttons */}
-        <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
           {onEditProduct && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onEditProduct(product);
               }}
-              className="p-1.5 bg-white/90 dark:bg-stone-900/90 text-stone-700 dark:text-stone-300 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black backdrop-blur-md transition-all shadow-xs cursor-pointer border border-stone-200/60 dark:border-stone-700/60"
+              className="p-2 rounded-full bg-white/90 dark:bg-stone-900/90 text-stone-700 dark:text-stone-300 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black backdrop-blur-md transition-all shadow-xs cursor-pointer border border-stone-200/70 dark:border-stone-700/70"
               title="Admin: Edit Product"
             >
               <Edit className="w-3.5 h-3.5" />
@@ -89,10 +89,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               e.stopPropagation();
               onToggleWishlist(product);
             }}
-            className={`p-1.5 backdrop-blur-md transition-all shadow-xs cursor-pointer border ${
+            className={`p-2 rounded-full backdrop-blur-md transition-all shadow-xs cursor-pointer border ${
               isWishlisted
-                ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                : 'bg-white/90 dark:bg-stone-900/90 text-stone-700 dark:text-stone-300 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black border-stone-200/60 dark:border-stone-700/60'
+                ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white scale-105'
+                : 'bg-white/90 dark:bg-stone-900/90 text-stone-700 dark:text-stone-300 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black border-stone-200/70 dark:border-stone-700/70'
             }`}
             title="Save to Wishlist"
             aria-label="Wishlist"
@@ -102,8 +102,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Quick View Hover Strip */}
-        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-center pointer-events-none">
-          <span className="bg-white dark:bg-stone-900 text-black dark:text-white border border-stone-200 dark:border-stone-700 text-[10px] font-extrabold tracking-widest uppercase px-3 py-1.5 shadow-md flex items-center gap-1.5">
+        <div className="absolute inset-x-0 bottom-0 p-3.5 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center pointer-events-none">
+          <span className="bg-white/95 dark:bg-stone-900/95 text-black dark:text-white border border-stone-200/80 dark:border-stone-700/80 text-[10px] font-extrabold tracking-widest uppercase px-3.5 py-1.5 rounded-full shadow-md flex items-center gap-1.5 backdrop-blur-xs">
             <Eye className="w-3 h-3" />
             <span>QUICK VIEW</span>
           </span>
@@ -111,7 +111,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Product Content Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5 bg-white dark:bg-stone-950 transition-colors">
+      <div className="p-4 sm:p-4.5 flex-1 flex flex-col justify-between space-y-3 bg-white dark:bg-stone-950 transition-colors">
         <div>
           {/* Style Code & Category Subtitle */}
           <div className="flex items-center justify-between text-[10px] text-stone-400 dark:text-stone-500 font-semibold uppercase tracking-wider mb-1">
@@ -119,7 +119,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <span className="font-mono text-stone-500 dark:text-stone-400">{product.styleCode}</span>
           </div>
 
-          {/* Product Title in Sharp Minimalist Uppercase */}
+          {/* Product Title */}
           <h3
             onClick={() => onQuickView(product)}
             className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:text-[13px] leading-snug uppercase line-clamp-2 hover:text-stone-600 dark:hover:text-stone-300 transition-colors cursor-pointer tracking-tight"
@@ -128,9 +128,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             {product.name}
           </h3>
 
-          {/* Price Formatting (e.g. Rs. 5,825.00) */}
-          <div className="flex items-baseline gap-2 mt-1.5">
-            <span className="text-sm sm:text-base font-black text-black dark:text-white">
+          {/* Price Formatting */}
+          <div className="flex items-baseline gap-2 mt-2">
+            <span className="text-sm sm:text-base font-black text-black dark:text-white tracking-tight">
               {formatNPR(product.price)}
             </span>
             {product.originalPrice && (
@@ -143,18 +143,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Interactive Color Swatches */}
         {product.colors && product.colors.length > 0 && (
-          <div className="pt-1.5 border-t border-stone-100 dark:border-stone-850 flex items-center justify-between">
+          <div className="pt-2 border-t border-stone-100 dark:border-stone-900 flex items-center justify-between">
             <span className="text-[10px] text-stone-400 dark:text-stone-500 uppercase tracking-wider font-medium">
               {activeColor?.name || 'Color'}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1.5">
               {product.colors.map((color, idx) => (
                 <button
                   key={color.name}
                   onClick={() => setSelectedColorIdx(idx)}
                   className={`w-4 h-4 rounded-full border transition-all cursor-pointer relative flex items-center justify-center ${
                     selectedColorIdx === idx
-                      ? 'ring-1 ring-black dark:ring-white ring-offset-1 dark:ring-offset-stone-950 border-white dark:border-stone-950 scale-110'
+                      ? 'ring-2 ring-black dark:ring-white ring-offset-1 dark:ring-offset-stone-950 border-white dark:border-stone-950 scale-110'
                       : 'border-stone-300 dark:border-stone-700 hover:scale-105'
                   }`}
                   style={{ backgroundColor: color.hex }}
@@ -175,13 +175,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {/* Minimalist Action Button */}
-        <div className="pt-2">
+        {/* Action Button */}
+        <div className="pt-1">
           <button
             onClick={() => onAddToCart(product, activeColor?.name, activeSize)}
-            className="w-full flex items-center justify-center gap-1.5 py-2 text-[11px] font-bold uppercase tracking-wider bg-black dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-black transition-colors cursor-pointer shadow-xs"
+            className="w-full flex items-center justify-center gap-2 py-2.5 text-[11px] font-bold uppercase tracking-wider bg-black dark:bg-white hover:bg-stone-800 dark:hover:bg-stone-200 text-white dark:text-black rounded-xl transition-all cursor-pointer shadow-xs hover:shadow-md active:scale-[0.99]"
           >
-            <ShoppingBag className="w-3 h-3" />
+            <ShoppingBag className="w-3.5 h-3.5" />
             <span>ADD TO BAG</span>
           </button>
         </div>
