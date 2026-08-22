@@ -2,8 +2,8 @@ import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 
 interface GeartradeLogoProps {
-  variant?: 'full' | 'mark' | 'badge' | 'horizontal';
-  theme?: 'dark' | 'light' | 'mono' | 'white' | 'auto';
+  variant?: 'full' | 'mark' | 'badge' | 'horizontal' | 'icon-only';
+  theme?: 'dark' | 'light' | 'mono' | 'white' | 'black' | 'green' | 'auto';
   size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   showTagline?: boolean;
@@ -21,11 +21,28 @@ export const GeartradeLogo: React.FC<GeartradeLogoProps> = ({
     const themeCtx = useTheme();
     isDarkMode = themeCtx.isDark;
   } catch {
-    isDarkMode = false;
+    if (typeof document !== 'undefined') {
+      isDarkMode = document.documentElement.classList.contains('dark');
+    }
+  }
+
+  // Determine styling based on theme setting
+  let textColorClass = 'text-stone-900 dark:text-white';
+  let fillColor = 'currentColor';
+
+  if (theme === 'white') {
+    textColorClass = 'text-white';
+  } else if (theme === 'black') {
+    textColorClass = 'text-stone-900';
+  } else if (theme === 'green') {
+    textColorClass = 'text-[#16a34a]';
+  } else if (theme === 'dark') {
+    textColorClass = 'text-white';
+  } else if (theme === 'light') {
+    textColorClass = 'text-stone-900';
   }
 
   const isDarkCanvas = theme === 'white' || (theme === 'auto' && isDarkMode);
-  const primaryColor = isDarkCanvas ? '#FFFFFF' : '#0F172A';
 
   const sizeConfigs = {
     sm: { iconWidth: 32, iconHeight: 18, textClass: 'text-xs tracking-[0.2em]', heightClass: 'h-6' },
@@ -40,8 +57,8 @@ export const GeartradeLogo: React.FC<GeartradeLogoProps> = ({
       viewBox="0 0 138 72"
       width={sizeConfigs.iconWidth}
       height={sizeConfigs.iconHeight}
-      className="shrink-0 transition-colors duration-200"
-      fill={primaryColor}
+      className={`shrink-0 transition-colors duration-200 ${textColorClass}`}
+      fill={fillColor}
       xmlns="http://www.w3.org/2000/svg"
       aria-label="GEARTRADE Official GT Emblem"
     >
@@ -76,7 +93,7 @@ export const GeartradeLogo: React.FC<GeartradeLogoProps> = ({
     </svg>
   );
 
-  if (variant === 'mark') {
+  if (variant === 'mark' || variant === 'icon-only') {
     return <div className={`inline-flex items-center ${className}`}>{GTEmblemSVG}</div>;
   }
 
@@ -97,8 +114,7 @@ export const GeartradeLogo: React.FC<GeartradeLogoProps> = ({
       {GTEmblemSVG}
       <div className="flex flex-col justify-center">
         <span
-          className={`font-black uppercase font-sans leading-none ${sizeConfigs.textClass} transition-colors duration-200`}
-          style={{ color: primaryColor }}
+          className={`font-black uppercase font-sans leading-none ${sizeConfigs.textClass} ${textColorClass} transition-colors duration-200`}
         >
           GEARTRADE
         </span>

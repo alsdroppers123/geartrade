@@ -1,208 +1,215 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ArrowRight, Camera } from 'lucide-react';
-import { Product, HeroSlideItem, ProductCategory } from '../types';
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { GeartradeLogo } from './GeartradeLogo';
+
+export interface HeroSlide {
+  id: string;
+  taglineLeft: string;
+  taglineLeftSub: string;
+  website: string;
+  mainHeadline: string;
+  image: string;
+  theme: 'light' | 'dark';
+}
+
+export const GEARTRADE_HERO_SLIDES: HeroSlide[] = [
+  {
+    id: 'slide-1',
+    taglineLeft: 'STEP IN',
+    taglineLeftSub: 'STAND OUT',
+    website: 'www.geartradenepal.com',
+    mainHeadline: 'STEP INTO THE SUN IN STYLE',
+    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1920&q=85',
+    theme: 'light',
+  },
+  {
+    id: 'slide-2',
+    taglineLeft: 'HIMALAYAN',
+    taglineLeftSub: 'PERFORMANCE',
+    website: 'www.geartradenepal.com',
+    mainHeadline: 'ENGINEERED FOR THE WILD TRAIL',
+    image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1920&q=85',
+    theme: 'light',
+  },
+  {
+    id: 'slide-3',
+    taglineLeft: 'ALPINE SERIES',
+    taglineLeftSub: 'SPRING SUMMER 2026',
+    website: 'www.geartradenepal.com',
+    mainHeadline: 'ULTRA-LIGHT EXPEDITION WEAR',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1920&q=85',
+    theme: 'light',
+  },
+];
+
+export const SONAM_HERO_SLIDES = GEARTRADE_HERO_SLIDES;
+
+// For backward compatibility with existing App.tsx props
+export const DEFAULT_HERO_SLIDES = GEARTRADE_HERO_SLIDES.map((s) => ({
+  id: s.id,
+  titleTop: s.taglineLeft,
+  titleMain: s.mainHeadline,
+  collection: s.taglineLeftSub,
+  description: s.website,
+  image: s.image,
+  ctaText: 'SHOP NOW',
+  targetCategory: 'mens',
+}));
 
 interface HeroBannerProps {
-  onExplore: () => void;
-  onSelectCategory: (cat: any) => void;
-  featuredProducts?: Product[];
-  customSlides?: HeroSlideItem[];
+  onExplore?: () => void;
+  onSelectCategory?: (cat: any) => void;
+  featuredProducts?: any[];
+  customSlides?: any[];
   isAdmin?: boolean;
   onOpenVisualStudio?: () => void;
 }
 
-export const DEFAULT_HERO_SLIDES: HeroSlideItem[] = [
-  {
-    id: 'slide-1',
-    titleTop: 'HIMALAYAN PERFORMANCE LOOKBOOK',
-    titleMain: 'ENGINEERED FOR THE WILD',
-    collection: 'SPRING / SUMMER 2026 EDITORIAL',
-    description: 'Ultra-durable technical shells, quick-dry trail layers, and alpine-grade windcheaters modeled for high-altitude resilience and urban gorpcore style.',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1920&q=85',
-    ctaText: 'SHOP MEN',
-    targetCategory: 'mens',
-  },
-  {
-    id: 'slide-2',
-    titleTop: 'EXPEDITION & BACKCOUNTRY SERIES',
-    titleMain: 'ALL-WEATHER TRAIL PERFORMANCE',
-    collection: 'TECHNICAL PACKS & FOOTWEAR',
-    description: 'Waterproof 45L trekking packs, carbon speedlock poles, and high-traction trail footwear modeled on demanding alpine ridges.',
-    image: 'https://images.unsplash.com/photo-1501555088652-021faa106b9b?auto=format&fit=crop&w=1920&q=85',
-    ctaText: 'EXPLORE GEARS',
-    targetCategory: 'bags_gears',
-  },
-  {
-    id: 'slide-3',
-    titleTop: 'LIGHTWEIGHT ALPINE MOUNTAIN WEAR',
-    titleMain: 'PEAK AGILITY ON EVERY SUMMIT',
-    collection: 'WOMEN’S MOUNTAIN SERIES',
-    description: '4-way ergonomic stretch shells and thermal fleeces tailored for extreme comfort across Annapurna and Everest routes.',
-    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1920&q=85',
-    ctaText: 'SHOP WOMEN',
-    targetCategory: 'womens',
-  },
-];
-
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   onExplore,
   onSelectCategory,
-  featuredProducts = [],
   customSlides,
-  isAdmin = false,
-  onOpenVisualStudio,
 }) => {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
 
-  const heroProducts = featuredProducts.filter((p) => p.displaySection === 'hero_showcase');
+  const rawSlides = customSlides && customSlides.length > 0 ? customSlides : SONAM_HERO_SLIDES;
+  const slides = rawSlides.map((s: any, idx: number) => ({
+    id: s.id || `slide-${idx}`,
+    taglineLeft: s.taglineLeft || s.titleTop || 'STEP IN',
+    taglineLeftSub: s.taglineLeftSub || s.collection || 'STAND OUT',
+    website: s.website || s.description || 'www.geartradenepal.com',
+    mainHeadline: s.mainHeadline || s.titleMain || 'STEP INTO THE SUN IN STYLE',
+    image: s.image,
+    targetCategory: s.targetCategory,
+    theme: s.theme || 'light',
+  }));
 
-  // Use custom slides if provided, otherwise use heroProducts if any, else default slides
-  const activeSlides: HeroSlideItem[] = (customSlides && customSlides.length > 0)
-    ? customSlides
-    : heroProducts.length > 0
-    ? heroProducts.map((p, idx) => ({
-        id: p.id,
-        titleTop: p.badge || p.collection || 'EXPEDITION GEAR',
-        titleMain: p.name.toUpperCase(),
-        collection: p.origin || 'TECHNICAL SERIES',
-        description: p.description,
-        image: p.images[0] || DEFAULT_HERO_SLIDES[idx % DEFAULT_HERO_SLIDES.length].image,
-        ctaText: `SHOP NOW`,
-        targetCategory: p.category,
-      }))
-    : DEFAULT_HERO_SLIDES;
+  // Ensure currentSlideIdx is always valid when slides array changes
+  const activeSlideIdx = Math.min(currentSlideIdx, Math.max(0, slides.length - 1));
 
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
-    }, 7000);
+      setCurrentSlideIdx((prev) => (prev + 1) % slides.length);
+    }, 6500);
     return () => clearInterval(timer);
-  }, [activeSlides.length]);
+  }, [slides.length]);
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? activeSlides.length - 1 : prev - 1));
+    setCurrentSlideIdx((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % activeSlides.length);
+    setCurrentSlideIdx((prev) => (prev + 1) % slides.length);
   };
 
-  const slide = activeSlides[currentSlide] || activeSlides[0];
+  const slide = slides[activeSlideIdx];
+
+  const handleShopNowClick = () => {
+    if (slide.targetCategory && onSelectCategory) {
+      onSelectCategory(slide.targetCategory);
+    }
+    const el = document.getElementById('catalog-section');
+    el?.scrollIntoView({ behavior: 'smooth' });
+    if (onExplore) onExplore();
+  };
 
   return (
-    <div className="relative w-full bg-stone-950 overflow-hidden select-none font-sans">
-      {/* Background Image Carousel */}
-      <div className="relative h-[380px] sm:h-[460px] lg:h-[540px] w-full">
-        {activeSlides.map((s, idx) => (
+    <section className="w-full bg-white dark:bg-stone-950 select-none font-sans transition-colors duration-150">
+      {/* 1. Full-Width Hero Image Slider with Banner Typography */}
+      <div className="relative w-full h-[320px] sm:h-[420px] md:h-[500px] lg:h-[560px] overflow-hidden bg-stone-100 dark:bg-stone-900">
+        {/* Render Slides */}
+        {slides.map((s, idx) => (
           <div
             key={s.id}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              idx === currentSlide ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+              idx === activeSlideIdx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
             }`}
           >
+            {/* Background Editorial Model Photography */}
             <img
               src={s.image}
-              alt={s.titleMain}
+              alt={s.mainHeadline}
               className="w-full h-full object-cover object-center"
             />
-            {/* Minimal High-End Gradient Mask */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+
+            {/* Subtle Gradient Overlays matching Sonam aesthetic */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-black/20" />
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/60 to-transparent" />
+
+            {/* Top Left Brand Typography: STEP IN STAND OUT */}
+            <div className="absolute top-8 left-6 sm:top-12 sm:left-14 text-white z-20">
+              <div className="space-y-0.5">
+                <p className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-wider leading-none uppercase drop-shadow-md">
+                  {s.taglineLeft}
+                </p>
+                <p className="text-xl sm:text-3xl lg:text-4xl font-extrabold tracking-wider leading-none uppercase drop-shadow-md text-stone-100">
+                  {s.taglineLeftSub}
+                </p>
+              </div>
+              <p className="text-[10px] sm:text-xs text-stone-200 tracking-widest mt-2 font-mono uppercase drop-shadow-xs">
+                {s.website}
+              </p>
+            </div>
+
+            {/* Top Right Geartrade Brand Watermark */}
+            <div className="absolute top-8 right-6 sm:top-12 sm:right-14 z-20 hidden sm:block">
+              <GeartradeLogo size="md" variant="full" theme="white" className="drop-shadow-lg opacity-90" />
+            </div>
+
+            {/* Center Bottom Headline */}
+            <div className="absolute inset-x-0 bottom-12 sm:bottom-16 text-center z-20 px-4">
+              <h2 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white uppercase tracking-[0.12em] drop-shadow-lg">
+                {s.mainHeadline}
+              </h2>
+            </div>
           </div>
         ))}
 
-        {/* Content Container */}
-        <div className="absolute inset-0 z-10 flex items-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="max-w-xl space-y-4">
-              {/* Minimal Collection Eyebrow */}
-              <div className="inline-flex items-center gap-2 text-stone-300 text-[10px] sm:text-[11px] font-bold tracking-[0.25em] uppercase">
-                <span className="w-1.5 h-1.5 bg-white rounded-full" />
-                <span>{slide.collection}</span>
-              </div>
-
-              {/* Headings */}
-              <div className="space-y-1.5">
-                <p className="text-[11px] sm:text-xs font-semibold tracking-[0.2em] text-stone-300 uppercase">
-                  {slide.titleTop}
-                </p>
-                <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white uppercase tracking-tight leading-tight">
-                  {slide.titleMain}
-                </h1>
-              </div>
-
-              <p className="text-stone-300 text-xs sm:text-sm max-w-lg line-clamp-2 leading-relaxed font-light">
-                {slide.description}
-              </p>
-
-              {/* Minimalist Action Buttons */}
-              <div className="pt-2 flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    onSelectCategory(slide.targetCategory);
-                    onExplore();
-                  }}
-                  className="px-7 py-3 bg-white hover:bg-stone-200 text-black font-extrabold text-xs tracking-[0.18em] uppercase rounded-none transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-                >
-                  <span>{slide.ctaText}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-
-                <button
-                  onClick={onExplore}
-                  className="px-6 py-3 border border-white/60 hover:border-white text-white hover:bg-white/10 font-bold text-xs tracking-[0.18em] uppercase rounded-none transition-all cursor-pointer backdrop-blur-xs"
-                >
-                  <span>VIEW ALL</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Admin Quick Photo Edit Trigger */}
-        {isAdmin && onOpenVisualStudio && (
-          <button
-            onClick={onOpenVisualStudio}
-            className="absolute top-4 right-4 z-30 px-3 py-1.5 bg-black/80 hover:bg-black text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 border border-white/30 backdrop-blur-xs shadow-lg cursor-pointer transition-all"
-            title="Edit hero photos & slides"
-          >
-            <Camera className="w-3.5 h-3.5 text-amber-400" />
-            <span>Admin: Change Photos</span>
-          </button>
-        )}
-
-        {/* Carousel Controls */}
+        {/* Left Directional Arrow Button */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-black/40 hover:bg-black text-white backdrop-blur-xs transition-colors cursor-pointer border border-white/10"
           aria-label="Previous Slide"
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/70 dark:bg-black/60 hover:bg-white dark:hover:bg-black/90 text-stone-900 dark:text-white shadow-md backdrop-blur-xs flex items-center justify-center transition-all cursor-pointer hover:scale-105"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
+        {/* Right Directional Arrow Button */}
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2.5 bg-black/40 hover:bg-black text-white backdrop-blur-xs transition-colors cursor-pointer border border-white/10"
           aria-label="Next Slide"
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/70 dark:bg-black/60 hover:bg-white dark:hover:bg-black/90 text-stone-900 dark:text-white shadow-md backdrop-blur-xs flex items-center justify-center transition-all cursor-pointer hover:scale-105"
         >
-          <ChevronRight className="w-4 h-4" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
 
-        {/* Minimal Slide Indicator Lines */}
-        <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
-          {activeSlides.map((_, idx) => (
+        {/* Bottom Slide Dots */}
+        <div className="absolute bottom-4 left-6 sm:left-14 z-30 flex items-center gap-2">
+          {slides.map((_, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentSlide(idx)}
-              className={`h-[2px] transition-all cursor-pointer ${
-                idx === currentSlide ? 'w-8 bg-white' : 'w-3 bg-white/40 hover:bg-white/70'
-              }`}
+              onClick={() => setCurrentSlideIdx(idx)}
               aria-label={`Go to slide ${idx + 1}`}
+              className={`transition-all rounded-full ${
+                idx === activeSlideIdx
+                  ? 'w-6 h-2 bg-white'
+                  : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+              }`}
             />
           ))}
         </div>
       </div>
-    </div>
+
+      {/* 2. Distinctive 'SHOP NOW' Sub-Header below hero (From Screenshot 1) */}
+      <div className="text-center py-7 sm:py-9 border-b border-stone-100 dark:border-stone-900">
+        <button
+          onClick={handleShopNowClick}
+          className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-black dark:text-stone-100 hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer inline-flex items-center gap-2 group"
+        >
+          <span>SHOP NOW</span>
+        </button>
+      </div>
+    </section>
   );
 };
-

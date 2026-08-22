@@ -1678,38 +1678,57 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                     PRODUCT PHOTOGRAPHY & ASSETS ({formProduct.images.length})
                   </label>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    {formProduct.images.map((img, idx) => (
-                      <div
-                        key={idx}
-                        className="relative group bg-stone-900 border border-stone-800 aspect-square overflow-hidden"
-                      >
-                        <img
-                          src={img}
-                          alt="preview"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const updated = formProduct.images.filter((_, i) => i !== idx);
-                              setFormProduct({ ...formProduct, images: updated });
-                            }}
-                            className="p-1.5 bg-rose-600 text-white cursor-pointer"
-                            title="Remove photo"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                      {formProduct.images.map((img, idx) => (
+                        <div
+                          key={idx}
+                          className="relative group bg-stone-900 border border-stone-800 aspect-square overflow-hidden"
+                        >
+                          <img
+                            src={img}
+                            alt="preview"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 p-1 text-center">
+                            {idx > 0 && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const selected = formProduct.images[idx];
+                                  const rest = formProduct.images.filter((_, i) => i !== idx);
+                                  setFormProduct({ ...formProduct, images: [selected, ...rest] });
+                                  showAdminToast('Set as Primary Cover photo');
+                                }}
+                                className="px-2 py-0.5 bg-amber-500 hover:bg-amber-400 text-black text-[9px] font-bold uppercase tracking-wider cursor-pointer"
+                              >
+                                Make Cover
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const updated = formProduct.images.filter((_, i) => i !== idx);
+                                setFormProduct({ ...formProduct, images: updated });
+                                showAdminToast('Removed photo');
+                              }}
+                              className="p-1 bg-rose-600 hover:bg-rose-500 text-white cursor-pointer"
+                              title="Remove photo"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                          {idx === 0 ? (
+                            <span className="absolute bottom-1 left-1 bg-amber-500 text-black text-[9px] font-bold px-1.5 py-0.5 uppercase tracking-wider">
+                              PRIMARY
+                            </span>
+                          ) : (
+                            <span className="absolute bottom-1 left-1 bg-black/80 text-white text-[9px] font-mono px-1">
+                              #{idx + 1}
+                            </span>
+                          )}
                         </div>
-                        {idx === 0 && (
-                          <span className="absolute bottom-1 left-1 bg-black text-white text-[9px] font-bold px-1 uppercase tracking-wider">
-                            PRIMARY
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
 
                   {/* Integrated Drag & Drop / Device Upload / URL Input */}
                   <ImageUploadInput

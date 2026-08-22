@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroBanner, DEFAULT_HERO_SLIDES } from './components/HeroBanner';
-import { DEFAULT_CATEGORY_CARDS } from './components/CategoryTiles';
+import { CategoryTiles, DEFAULT_CATEGORY_CARDS } from './components/CategoryTiles';
 import { ProductCard } from './components/ProductCard';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartDrawer } from './components/CartDrawer';
@@ -17,7 +17,7 @@ import { INITIAL_PRODUCTS } from './data/products';
 import { CartItem, Order, Product, ProductCategory, ProductSection, AuthUser, HeroSlideItem, CategoryTileItem } from './types';
 import { POPULAR_COUPONS } from './data/nepalLocations';
 import { getCurrentUser, saveUserSession, clearUserSession } from './services/authService';
-import { SlidersHorizontal, Filter, CheckCircle2, Heart, X, Flame, Sparkle, Trophy, ArrowRight } from 'lucide-react';
+import { SlidersHorizontal, Filter, CheckCircle2, Heart, X, Flame, Sparkle, Trophy, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function App() {
   // Navigation View State: 'store' vs 'admin'
@@ -50,27 +50,8 @@ export default function App() {
   // Global State with Local Persistence for Products & Logistics
   const [products, setProducts] = useState<Product[]>(() => {
     try {
-      const saved = localStorage.getItem('geartrade_products_v2');
+      const saved = localStorage.getItem('geartrade_products_v2') || localStorage.getItem('geartrade_products');
       if (saved) return JSON.parse(saved);
-      // Migrate or use initial products with new editorial modeling photography
-      const oldSaved = localStorage.getItem('geartrade_products');
-      if (oldSaved) {
-        const parsed: Product[] = JSON.parse(oldSaved);
-        // Map default items to the new modeling model imagery while preserving any custom items created by admin
-        const initialMap = new Map(INITIAL_PRODUCTS.map((p) => [p.id, p]));
-        const merged = parsed.map((p) => {
-          const defaultItem = initialMap.get(p.id);
-          if (defaultItem) {
-            return {
-              ...p,
-              images: defaultItem.images,
-            };
-          }
-          return p;
-        });
-        localStorage.setItem('geartrade_products_v2', JSON.stringify(merged));
-        return merged;
-      }
       return INITIAL_PRODUCTS;
     } catch {
       return INITIAL_PRODUCTS;
@@ -80,7 +61,8 @@ export default function App() {
   // Search & Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [activeBadgeFilter, setActiveBadgeFilter] = useState<'all' | 'new' | 'bestseller' | 'trending'>('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [activeBadgeFilter, setActiveBadgeFilter] = useState<'all' | 'new' | 'bestseller' | 'trending'>('new');
   const [sortBy, setSortBy] = useState<'featured' | 'price_low' | 'price_high' | 'rating'>('featured');
   const [inStockOnly, setInStockOnly] = useState(false);
 
@@ -128,6 +110,32 @@ export default function App() {
       return [];
     }
   });
+
+  // Dark / Light Theme state with local persistence
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('sonam_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sonam_theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch {}
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
 
   // Toast Notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -229,9 +237,13 @@ export default function App() {
 
   const handleResetDefaults = () => {
     setProducts(INITIAL_PRODUCTS);
+    setHeroSlides(DEFAULT_HERO_SLIDES);
+    setCategoryCards(DEFAULT_CATEGORY_CARDS);
     localStorage.removeItem('geartrade_products');
     localStorage.removeItem('geartrade_products_v2');
-    showToast('Restored original factory catalog');
+    localStorage.removeItem('geartrade_hero_slides');
+    localStorage.removeItem('geartrade_category_cards');
+    showToast('Restored all factory catalog photos and lookbook presets');
   };
 
   const handleUpdateOrderStatus = (orderId: string, status: Order['orderStatus'], paymentStatus?: Order['paymentStatus']) => {
@@ -379,6 +391,16 @@ export default function App() {
         // Category Filter
         const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
 
+        // Subcategory Filter (e.g. from Mega Menu)
+        let matchesSubcategory = true;
+        if (selectedSubcategory) {
+          const subLower = selectedSubcategory.toLowerCase();
+          matchesSubcategory =
+            (p.subcategory && p.subcategory.toLowerCase().includes(subLower)) ||
+            (p.name && p.name.toLowerCase().includes(subLower)) ||
+            (p.tags && p.tags.some((t) => t.toLowerCase().includes(subLower)));
+        }
+
         // Search Filter
         const matchesSearch =
           searchQuery === '' ||
@@ -397,7 +419,7 @@ export default function App() {
         // Stock Filter
         const matchesStock = !inStockOnly || p.inStock;
 
-        return matchesCategory && matchesSearch && matchesBadge && matchesStock;
+        return matchesCategory && matchesSubcategory && matchesSearch && matchesBadge && matchesStock;
       })
       .sort((a, b) => {
         if (sortBy === 'price_low') return a.price - b.price;
@@ -465,10 +487,14 @@ export default function App() {
         cartCount={totalCartCount}
         wishlistCount={wishlist.length}
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        selectedCategory={selectedCategory}
-        onSelectCategory={(cat) => {
+        onSearchChange={(q) => {
+          setSearchQuery(q);
+          setSelectedSubcategory(null);
+        }}
+        selectedCategory={selectedCategory as ProductCategory}
+        onSelectCategory={(cat, subcat) => {
           setSelectedCategory(cat);
+          setSelectedSubcategory(subcat || null);
           const el = document.getElementById('catalog-section');
           el?.scrollIntoView({ behavior: 'smooth' });
         }}
@@ -485,6 +511,8 @@ export default function App() {
         currentUser={currentUser}
         onOpenLoginModal={() => setIsLoginModalOpen(true)}
         onLogout={handleLogout}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Main Hero Banner with Slider */}
@@ -495,6 +523,7 @@ export default function App() {
         }}
         onSelectCategory={(cat) => {
           setSelectedCategory(cat);
+          setSelectedSubcategory(null);
           const el = document.getElementById('catalog-section');
           el?.scrollIntoView({ behavior: 'smooth' });
         }}
@@ -508,231 +537,146 @@ export default function App() {
         }}
       />
 
-      {/* Admin Featured / Curated Showcase Section (if active) */}
-      {flashSaleProducts.length > 0 && selectedCategory === 'all' && searchQuery === '' && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 w-full">
-          <div className="bg-stone-900 dark:bg-stone-950 p-6 sm:p-8 text-white border border-stone-800 relative overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 relative z-10">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-black dark:bg-white text-white dark:text-black text-[10px] font-bold uppercase tracking-[0.2em]">
-                    <Flame className="w-3 h-3 text-white dark:text-black" />
-                    CURATED EXPEDITION GEAR
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-white">
-                  Featured Himalayan Specials
-                </h2>
-                <p className="text-xs text-stone-400 font-light">
-                  Hand-selected technical gear engineered for extreme weather resilience.
-                </p>
-              </div>
-
-              <button
-                onClick={() => {
-                  const el = document.getElementById('catalog-section');
-                  el?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="self-start sm:self-auto px-4 py-2 bg-white dark:bg-stone-900 text-black dark:text-white hover:bg-stone-200 dark:hover:bg-stone-800 text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer border border-transparent dark:border-stone-700"
-              >
-                <span>View Full Catalog</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10">
-              {flashSaleProducts.slice(0, 4).map((product) => (
-                <div key={product.id} className="p-1">
-                  <ProductCard
-                    product={product}
-                    isWishlisted={wishlist.includes(product.id)}
-                    onToggleWishlist={handleToggleWishlist}
-                    onAddToCart={(p) => handleAddToCart(p, 1)}
-                    onQuickView={(p) => setSelectedProduct(p)}
-                    onExpressBuy={(p) => handleExpressBuy(p, 1)}
-                    onEditProduct={(p) => handleOpenAdminWithProduct(p.id)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* 5-Column Visual Category Tiles (Men's, Women's, Kids', Bags&Gears, Shoes) */}
+      <CategoryTiles
+        selectedCategory={selectedCategory as ProductCategory}
+        onSelectCategory={(cat) => {
+          setSelectedCategory(cat);
+          setSelectedSubcategory(null);
+          const el = document.getElementById('catalog-section');
+          el?.scrollIntoView({ behavior: 'smooth' });
+        }}
+        customCards={categoryCards}
+        isAdmin={Boolean(currentUser?.isAdmin)}
+        onOpenVisualStudio={() => {
+          setAdminInitialTab('visuals');
+          setCurrentView('admin');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
 
       {/* Product Catalog Section */}
-      <main id="catalog-section" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-        {/* Section Heading, Badge Tabs, and Sorting Filters */}
-        <div className="flex flex-col gap-5 pb-6 border-b border-stone-200 dark:border-stone-800">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase text-stone-500 dark:text-stone-400 tracking-[0.2em]">
-                  TECHNICAL APPAREL & EQUIPMENT
-                </span>
-                <span className="bg-stone-100 dark:bg-stone-900 text-stone-700 dark:text-stone-300 text-xs font-bold px-2 py-0.5 border border-stone-200 dark:border-stone-800 font-mono">
-                  {filteredProducts.length} ITEMS
-                </span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-black text-stone-900 dark:text-stone-100 uppercase tracking-tight mt-1">
-                {selectedCategory === 'all'
-                  ? 'All Outdoor Collections'
-                  : selectedCategory === 'mens'
-                  ? "Men's Technical Collection"
-                  : selectedCategory === 'womens'
-                  ? "Women's Mountain Wear"
-                  : selectedCategory === 'kids'
-                  ? "Junior & Kids Outdoor"
-                  : selectedCategory === 'bags_gears'
-                  ? 'Expedition Bags & Packs'
-                  : 'Trail & Alpine Footwear'}
-              </h2>
-            </div>
-
-            {/* Quick Badge Filter Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setActiveBadgeFilter('all')}
-                className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border ${
-                  activeBadgeFilter === 'all'
-                    ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                    : 'bg-white dark:bg-stone-950 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-700 hover:border-black dark:hover:border-white'
-                }`}
-              >
-                All Gear
-              </button>
-              <button
-                onClick={() => setActiveBadgeFilter('bestseller')}
-                className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1.5 ${
-                  activeBadgeFilter === 'bestseller'
-                    ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                    : 'bg-white dark:bg-stone-950 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-700 hover:border-black dark:hover:border-white'
-                }`}
-              >
-                <Trophy className="w-3.5 h-3.5" />
-                <span>Best Sellers</span>
-              </button>
-              <button
-                onClick={() => setActiveBadgeFilter('new')}
-                className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1.5 ${
-                  activeBadgeFilter === 'new'
-                    ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                    : 'bg-white dark:bg-stone-950 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-700 hover:border-black dark:hover:border-white'
-                }`}
-              >
-                <Sparkle className="w-3.5 h-3.5" />
-                <span>New Arrivals</span>
-              </button>
-              <button
-                onClick={() => setActiveBadgeFilter('trending')}
-                className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer border flex items-center gap-1.5 ${
-                  activeBadgeFilter === 'trending'
-                    ? 'bg-black dark:bg-white text-white dark:text-black border-black dark:border-white'
-                    : 'bg-white dark:bg-stone-950 text-stone-600 dark:text-stone-300 border-stone-300 dark:border-stone-700 hover:border-black dark:hover:border-white'
-                }`}
-              >
-                <Flame className="w-3.5 h-3.5" />
-                <span>Trending</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Secondary Filter & Sort Strip */}
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+      <main id="catalog-section" className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 w-full font-sans">
+        {/* Active subcategory indicator if selected from Mega Menu */}
+        {selectedSubcategory && (
+          <div className="mb-4 flex items-center justify-between p-3 bg-stone-50 border border-stone-200 text-xs">
             <div className="flex items-center gap-2">
-              <span className="text-stone-400 dark:text-stone-500 font-bold uppercase tracking-wider text-[11px]">CATEGORY:</span>
-              <div className="flex flex-wrap gap-1">
-                {[
-                  { id: 'all', label: 'All' },
-                  { id: 'mens', label: "Men's" },
-                  { id: 'womens', label: "Women's" },
-                  { id: 'kids', label: 'Kids' },
-                  { id: 'bags_gears', label: 'Bags & Gears' },
-                  { id: 'shoes', label: 'Shoes' },
-                ].map((c) => (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelectedCategory(c.id)}
-                    className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                      selectedCategory === c.id
-                        ? 'bg-black dark:bg-white text-white dark:text-black'
-                        : 'text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 bg-stone-100 dark:bg-stone-900 hover:bg-stone-200 dark:hover:bg-stone-800'
-                    }`}
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
+              <span className="font-bold text-stone-500 uppercase">Filtered by Subcategory:</span>
+              <span className="font-black text-[#16a34a] uppercase tracking-wide">{selectedSubcategory}</span>
             </div>
+            <button
+              onClick={() => setSelectedSubcategory(null)}
+              className="text-stone-500 hover:text-black font-semibold uppercase flex items-center gap-1"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>Clear Filter</span>
+            </button>
+          </div>
+        )}
 
-            {/* Sort & In-Stock */}
-            <div className="flex items-center gap-2.5">
-              <div className="flex items-center gap-1.5 bg-white dark:bg-stone-950 border border-stone-300 dark:border-stone-700 px-3 py-1.5">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-stone-500 dark:text-stone-400" />
-                <label htmlFor="sort-select" className="text-stone-400 dark:text-stone-500 font-bold uppercase text-[10px] tracking-wider">SORT:</label>
-                <select
-                  id="sort-select"
-                  aria-label="Sort products by"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="bg-transparent font-bold text-stone-900 dark:text-stone-100 focus:outline-none cursor-pointer uppercase text-xs tracking-wider"
-                >
-                  <option value="featured" className="bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100">Featured Collection</option>
-                  <option value="price_low" className="bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100">Price: Low to High</option>
-                  <option value="price_high" className="bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100">Price: High to Low</option>
-                  <option value="rating" className="bg-white dark:bg-stone-950 text-stone-900 dark:text-stone-100">Top Rated</option>
-                </select>
-              </div>
-
-              <button
-                onClick={() => setInStockOnly(!inStockOnly)}
-                className={`px-3 py-1.5 border text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer ${
-                  inStockOnly
-                    ? 'bg-black dark:bg-white border-black dark:border-white text-white dark:text-black'
-                    : 'bg-white dark:bg-stone-950 border-stone-300 dark:border-stone-700 text-stone-700 dark:text-stone-300 hover:border-black dark:hover:border-white'
-                }`}
-              >
-                {inStockOnly ? '✓ In Stock Only' : 'All Stock'}
-              </button>
-            </div>
+        {/* Sonam Gear 3-Pill Filter Group (Best Seller | New Arrival | Trending) */}
+        <div className="flex items-center justify-center pt-2 pb-8">
+          <div className="inline-flex items-center p-1 bg-[#eceff1] rounded-lg border border-stone-200 gap-1 select-none">
+            <button
+              onClick={() => setActiveBadgeFilter(activeBadgeFilter === 'bestseller' ? 'all' : 'bestseller')}
+              className={`px-5 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                activeBadgeFilter === 'bestseller'
+                  ? 'bg-white text-stone-900 shadow-xs font-bold'
+                  : 'text-stone-600 hover:text-black'
+              }`}
+            >
+              Best Seller
+            </button>
+            <button
+              onClick={() => setActiveBadgeFilter(activeBadgeFilter === 'new' ? 'all' : 'new')}
+              className={`px-5 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                activeBadgeFilter === 'new'
+                  ? 'bg-white text-[#16a34a] shadow-xs font-bold'
+                  : 'text-stone-600 hover:text-black'
+              }`}
+            >
+              New Arrival
+            </button>
+            <button
+              onClick={() => setActiveBadgeFilter(activeBadgeFilter === 'trending' ? 'all' : 'trending')}
+              className={`px-5 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
+                activeBadgeFilter === 'trending'
+                  ? 'bg-white text-stone-900 shadow-xs font-bold'
+                  : 'text-stone-600 hover:text-black'
+              }`}
+            >
+              Trending
+            </button>
           </div>
         </div>
 
-        {/* Product Cards Grid */}
+        {/* Product Cards Grid with Row Navigation Controls (Matches Screenshot 1) */}
         {filteredProducts.length === 0 ? (
           <div className="py-20 text-center space-y-3">
-            <div className="w-14 h-14 bg-stone-100 dark:bg-stone-900 flex items-center justify-center mx-auto text-stone-400">
+            <div className="w-14 h-14 bg-stone-100 flex items-center justify-center mx-auto text-stone-400">
               <Filter className="w-6 h-6" />
             </div>
-            <p className="text-stone-900 dark:text-stone-100 font-bold text-sm uppercase tracking-wider">No matching products found</p>
-            <p className="text-xs text-stone-500 dark:text-stone-400 max-w-sm mx-auto font-light">
+            <p className="text-stone-900 font-bold text-sm uppercase tracking-wider">No matching products found</p>
+            <p className="text-xs text-stone-500 max-w-sm mx-auto font-light">
               Try adjusting your search terms or clearing the active category filters.
             </p>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setSelectedCategory('all');
+                setSelectedSubcategory(null);
                 setActiveBadgeFilter('all');
                 setInStockOnly(false);
               }}
-              className="px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-wider hover:bg-stone-800 dark:hover:bg-stone-200 cursor-pointer"
+              className="px-5 py-2.5 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider cursor-pointer"
             >
               Reset Filters
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-6">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                isWishlisted={wishlist.includes(product.id)}
-                onToggleWishlist={handleToggleWishlist}
-                onAddToCart={(p) => handleAddToCart(p, 1)}
-                onQuickView={(p) => setSelectedProduct(p)}
-                onExpressBuy={(p) => handleExpressBuy(p, 1)}
-                onEditProduct={(p) => handleOpenAdminWithProduct(p.id)}
-              />
-            ))}
+          <div className="relative">
+            {/* Left Directional Navigation Arrow (Matches Screenshot 1) */}
+            <button
+              onClick={() => {
+                const grid = document.getElementById('sonam-product-grid');
+                grid?.scrollBy({ left: -320, behavior: 'smooth' });
+              }}
+              className="hidden sm:flex absolute -left-4 top-1/3 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-lg border border-stone-200 text-stone-900 items-center justify-center hover:bg-stone-50 transition-all cursor-pointer"
+              aria-label="Previous products"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Right Directional Navigation Arrow (Matches Screenshot 1) */}
+            <button
+              onClick={() => {
+                const grid = document.getElementById('sonam-product-grid');
+                grid?.scrollBy({ left: 320, behavior: 'smooth' });
+              }}
+              className="hidden sm:flex absolute -right-4 top-1/3 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white shadow-lg border border-stone-200 text-stone-900 items-center justify-center hover:bg-stone-50 transition-all cursor-pointer"
+              aria-label="Next products"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            {/* Clean 4-Column Product Grid */}
+            <div
+              id="sonam-product-grid"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8"
+            >
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isWishlisted={wishlist.includes(product.id)}
+                  onToggleWishlist={handleToggleWishlist}
+                  onAddToCart={(p, color, size) => handleAddToCart(p, 1, color, size)}
+                  onQuickView={(p) => setSelectedProduct(p)}
+                  onExpressBuy={(p, color, size) => handleExpressBuy(p, 1, color, size)}
+                  onEditProduct={(p) => handleOpenAdminWithProduct(p.id)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </main>
