@@ -400,7 +400,7 @@ export const AdminProductManagerModal: React.FC<AdminProductManagerModalProps> =
 
         {/* Global Alert Notification */}
         {alertNotice && (
-          <div className="bg-emerald-600 text-white text-xs font-bold px-6 py-2 flex items-center gap-2 animate-fadeIn">
+          <div className="bg-red-600 text-white text-xs font-bold px-6 py-2 flex items-center gap-2 animate-fadeIn">
             <CheckCircle2 className="w-4 h-4" />
             <span>{alertNotice}</span>
           </div>
@@ -625,7 +625,7 @@ export const AdminProductManagerModal: React.FC<AdminProductManagerModalProps> =
                                       ? 'text-rose-600'
                                       : p.stockCount <= 10
                                       ? 'text-amber-600'
-                                      : 'text-emerald-700'
+                                      : 'text-red-700'
                                   }`}
                                 >
                                   {p.stockCount}
@@ -641,7 +641,7 @@ export const AdminProductManagerModal: React.FC<AdminProductManagerModalProps> =
                                 <span
                                   className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
                                     p.inStock && p.stockCount > 0
-                                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                      ? 'bg-red-50 text-red-700 border border-red-200'
                                       : 'bg-rose-50 text-rose-700 border border-rose-200'
                                   }`}
                                 >

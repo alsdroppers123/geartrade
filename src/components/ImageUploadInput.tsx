@@ -130,7 +130,7 @@ export const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
             {sublabel && <p className="text-[11px] text-stone-500 dark:text-stone-400 font-light">{sublabel}</p>}
           </div>
           {value && (
-            <span className="text-[10px] font-mono bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 font-bold border border-emerald-300 dark:border-emerald-800">
+            <span className="text-[10px] font-mono bg-red-100 dark:bg-red-950 text-red-800 dark:text-red-300 px-2 py-0.5 font-bold border border-red-300 dark:border-red-800">
               PHOTO ACTIVE
             </span>
           )}

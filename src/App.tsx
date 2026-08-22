@@ -114,7 +114,7 @@ export default function App() {
   // Dark / Light Theme state with local persistence
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     try {
-      const saved = localStorage.getItem('sonam_theme');
+      const saved = localStorage.getItem('geartrade_theme') || localStorage.getItem('sonam_theme');
       if (saved === 'dark' || saved === 'light') return saved;
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     } catch {
@@ -124,7 +124,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('sonam_theme', theme);
+      localStorage.setItem('geartrade_theme', theme);
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
@@ -439,7 +439,7 @@ export default function App() {
         {/* Toast Notification */}
         {toastMessage && (
           <div className="fixed bottom-6 right-6 z-50 bg-stone-900 text-white text-xs font-semibold px-4 py-3 border border-stone-700 flex items-center gap-2 animate-slideUp">
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-red-500" />
             <span>{toastMessage}</span>
           </div>
         )}
@@ -477,7 +477,7 @@ export default function App() {
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 bg-black dark:bg-stone-900 text-white text-xs font-semibold px-4 py-3 border border-stone-700 flex items-center gap-2 animate-slideUp shadow-xl">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <CheckCircle2 className="w-4 h-4 text-red-500" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -562,7 +562,7 @@ export default function App() {
           <div className="mb-4 flex items-center justify-between p-3 bg-stone-50 border border-stone-200 text-xs">
             <div className="flex items-center gap-2">
               <span className="font-bold text-stone-500 uppercase">Filtered by Subcategory:</span>
-              <span className="font-black text-[#16a34a] uppercase tracking-wide">{selectedSubcategory}</span>
+              <span className="font-black text-[#dc2626] uppercase tracking-wide">{selectedSubcategory}</span>
             </div>
             <button
               onClick={() => setSelectedSubcategory(null)}
@@ -591,7 +591,7 @@ export default function App() {
               onClick={() => setActiveBadgeFilter(activeBadgeFilter === 'new' ? 'all' : 'new')}
               className={`px-5 py-2 text-xs font-semibold rounded-md transition-all cursor-pointer ${
                 activeBadgeFilter === 'new'
-                  ? 'bg-white text-[#16a34a] shadow-xs font-bold'
+                  ? 'bg-white text-[#dc2626] shadow-xs font-bold'
                   : 'text-stone-600 hover:text-black'
               }`}
             >
@@ -628,7 +628,7 @@ export default function App() {
                 setActiveBadgeFilter('all');
                 setInStockOnly(false);
               }}
-              className="px-5 py-2.5 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider cursor-pointer"
+              className="px-5 py-2.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-bold text-xs uppercase tracking-wider cursor-pointer"
             >
               Reset Filters
             </button>

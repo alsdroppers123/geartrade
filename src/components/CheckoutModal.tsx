@@ -525,7 +525,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onClick={handleCopyPRN}
                       className="text-stone-700 dark:text-stone-300 hover:text-black dark:hover:text-white font-semibold flex items-center gap-1 cursor-pointer"
                     >
-                      {copiedPRN ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedPRN ? <Check className="w-3 h-3 text-red-600" /> : <Copy className="w-3 h-3" />}
                       <span>{copiedPRN ? 'Copied' : 'Copy'}</span>
                     </button>
                   </div>
@@ -593,7 +593,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
 
                     {isSimulatingBankApp && (
-                      <div className="flex items-center justify-center gap-2 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800">
+                      <div className="flex items-center justify-center gap-2 py-2 text-xs font-bold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800">
                         <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                         <span>Verifying transaction...</span>
                       </div>

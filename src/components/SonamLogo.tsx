@@ -20,19 +20,19 @@ export const SonamLogo: React.FC<SonamLogoProps> = ({
 
   const colorConfig = {
     green: {
-      primary: '#16a34a', // vibrant forest green
-      secondary: '#22c55e',
-      leaf: '#16a34a',
+      primary: '#dc2626', // vibrant red
+      secondary: '#ef4444',
+      leaf: '#dc2626',
     },
     white: {
       primary: '#ffffff',
       secondary: '#f3f4f6',
-      leaf: '#22c55e',
+      leaf: '#dc2626',
     },
     dark: {
       primary: '#18181b',
       secondary: '#27272a',
-      leaf: '#16a34a',
+      leaf: '#dc2626',
     },
   }[variant];
 

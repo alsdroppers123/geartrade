@@ -214,7 +214,7 @@ export const StoreLocatorModal: React.FC<StoreLocatorModalProps> = ({ isOpen, on
 
               {/* In-Store Fonepay QR Support */}
               <div className="bg-stone-100 dark:bg-stone-800/60 border border-stone-300 dark:border-stone-700 p-3 flex items-center gap-2.5 text-xs text-stone-800 dark:text-stone-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
                 <span className="font-light">
                   <strong className="font-bold">Fonepay Dynamic QR</strong>, eSewa, and all major cards accepted at this store POS terminal.
                 </span>

@@ -226,7 +226,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 {appliedCoupon ? (
                   <div className="flex items-center justify-between bg-stone-100 dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-stone-900 dark:text-stone-100 px-3 py-2">
                     <div className="flex items-center gap-1.5 font-bold text-xs">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                      <Sparkles className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
                       <span>{appliedCoupon} Applied ({POPULAR_COUPONS[appliedCoupon]?.description})</span>
                     </div>
                     <button
@@ -257,7 +257,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 {couponFeedback && (
                   <p
                     className={`text-[10px] font-bold ${
-                      couponFeedback.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      couponFeedback.success ? 'text-red-600 dark:text-red-400' : 'text-rose-600 dark:text-rose-400'
                     }`}
                   >
                     {couponFeedback.text}
@@ -291,7 +291,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <span className="text-stone-900 dark:text-stone-100 font-bold">{formatNPR(subtotal)}</span>
                 </div>
                 {discount > 0 && (
-                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-bold">
+                  <div className="flex justify-between text-red-600 dark:text-red-400 font-bold">
                     <span>Discount ({appliedCoupon})</span>
                     <span>-{formatNPR(discount)}</span>
                   </div>

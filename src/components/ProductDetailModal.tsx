@@ -85,7 +85,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               title="Share gear"
             >
               <Share2 className="w-4 h-4" />
-              {copiedLink && <span className="text-xs text-emerald-600 dark:text-emerald-400 font-bold">Copied!</span>}
+              {copiedLink && <span className="text-xs text-red-600 dark:text-red-400 font-bold">Copied!</span>}
             </button>
             <button
               onClick={onClose}

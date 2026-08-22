@@ -676,7 +676,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
           <div className="flex items-center gap-3">
             {/* Operator info */}
             <div className="hidden md:flex items-center gap-2 px-2.5 py-1 bg-stone-900 border border-stone-800 text-[11px] font-mono">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <UserCheck className="w-3.5 h-3.5 text-red-400" />
               <span className="text-stone-300">{currentUser?.email}</span>
             </div>
 
@@ -1929,7 +1929,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                       className="px-3.5 py-1.5 bg-stone-900 hover:bg-stone-800 text-stone-200 border border-stone-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow"
                       title="Download CSV Manifest for Courier Handover"
                     >
-                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-red-400" />
                       <span>EXPORT COURIER MANIFEST (CSV)</span>
                     </button>
                   </div>
@@ -2015,12 +2015,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                     }}
                     className={`p-3 text-left border cursor-pointer transition-colors ${
                       orderStatusFilter === 'delivered'
-                        ? 'bg-emerald-950/80 border-emerald-500 text-emerald-300'
+                        ? 'bg-red-950/80 border-red-500 text-red-300'
                         : 'bg-stone-900/60 border-stone-800 text-stone-400 hover:bg-stone-900'
                     }`}
                   >
                     <div className="text-[10px] font-bold uppercase flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+                      <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
                       <span>DELIVERED</span>
                     </div>
                     <div className="text-lg font-black text-white font-mono">{deliveredCount}</div>
@@ -2214,7 +2214,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                                     }}
                                     className={`px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider font-mono border cursor-pointer ${
                                       isPaid
-                                        ? 'bg-emerald-950 text-emerald-300 border-emerald-800'
+                                        ? 'bg-red-950 text-red-300 border-red-800'
                                         : isCOD
                                         ? 'bg-amber-950 text-amber-300 border-amber-800'
                                         : 'bg-stone-900 text-stone-400 border-stone-800'
@@ -2268,12 +2268,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                                         onUpdateOrderStatus(o.id, 'delivered', 'completed');
                                         showAdminToast(`Order #${o.id} marked as DELIVERED & PAID`);
                                       }}
-                                      className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider cursor-pointer"
+                                      className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider cursor-pointer"
                                     >
                                       ✓ MARK DELIVERED
                                     </button>
                                   ) : (
-                                    <span className="px-2 py-0.5 bg-emerald-950 text-emerald-300 border border-emerald-800 text-[10px] font-bold uppercase tracking-wider">
+                                    <span className="px-2 py-0.5 bg-red-950 text-red-300 border border-red-800 text-[10px] font-bold uppercase tracking-wider">
                                       COMPLETED
                                     </span>
                                   )}
@@ -2738,7 +2738,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                       }}
                       className="flex items-center gap-1 px-2 py-0.5 bg-white text-black text-[10px] font-bold uppercase tracking-wider cursor-pointer"
                     >
-                      {copiedOriginInAdmin ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
+                      {copiedOriginInAdmin ? <CheckCircle2 className="w-3 h-3 text-red-600" /> : <Copy className="w-3 h-3" />}
                       <span>{copiedOriginInAdmin ? 'Copied' : 'Copy URL'}</span>
                     </button>
                   </div>

@@ -205,7 +205,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       <div className="text-center py-7 sm:py-9 border-b border-stone-100 dark:border-stone-900">
         <button
           onClick={handleShopNowClick}
-          className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-black dark:text-stone-100 hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer inline-flex items-center gap-2 group"
+          className="text-xs sm:text-sm font-bold uppercase tracking-[0.25em] text-black dark:text-stone-100 hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer inline-flex items-center gap-2 group"
         >
           <span>SHOP NOW</span>
         </button>

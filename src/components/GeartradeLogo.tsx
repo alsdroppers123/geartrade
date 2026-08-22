@@ -34,8 +34,8 @@ export const GeartradeLogo: React.FC<GeartradeLogoProps> = ({
     textColorClass = 'text-white';
   } else if (theme === 'black') {
     textColorClass = 'text-stone-900';
-  } else if (theme === 'green') {
-    textColorClass = 'text-[#16a34a]';
+  } else if (theme === 'green' || (theme as string) === 'red') {
+    textColorClass = 'text-[#dc2626]';
   } else if (theme === 'dark') {
     textColorClass = 'text-white';
   } else if (theme === 'light') {

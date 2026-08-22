@@ -44,10 +44,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           loading="lazy"
         />
 
-        {/* Top Left Green Badge (New Arrival / Trending) */}
+        {/* Top Left Red Badge (New Arrival / Trending) */}
         <div className="absolute top-3 left-3 z-10">
           {product.badge === 'New Arrival' || product.isNewArrival ? (
-            <span className="bg-[#16a34a] text-white text-[10px] sm:text-[11px] font-bold px-2.5 py-1 rounded-[3px] uppercase tracking-wide shadow-xs">
+            <span className="bg-[#dc2626] text-white text-[10px] sm:text-[11px] font-bold px-2.5 py-1 rounded-[3px] uppercase tracking-wide shadow-xs">
               New Arrival
             </span>
           ) : product.badge === 'Trending' || product.isTrending ? (
@@ -77,7 +77,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             }}
             className={`p-2 rounded-full shadow-md backdrop-blur-xs transition-all cursor-pointer ${
               isWishlisted
-                ? 'bg-[#16a34a] text-white'
+                ? 'bg-[#dc2626] text-white'
                 : 'bg-white/90 dark:bg-stone-800/90 text-stone-700 dark:text-stone-200 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-stone-700'
             }`}
             title="Wishlist"
@@ -112,7 +112,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* Product Title + Seasonal Tag */}
           <h3
             onClick={() => onQuickView(product)}
-            className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:text-[13px] leading-snug uppercase line-clamp-2 hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer tracking-tight"
+            className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:text-[13px] leading-snug uppercase line-clamp-2 hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer tracking-tight"
             title={displayName}
           >
             {displayName}

@@ -292,7 +292,7 @@ export const CourierDispatchModal: React.FC<CourierDispatchModalProps> = ({
                 onClick={() => setPaymentStatus('completed')}
                 className={`px-3 py-1 text-[11px] font-bold uppercase tracking-wider border ${
                   paymentStatus === 'completed' || paymentStatus === 'verified'
-                    ? 'bg-emerald-600 text-white border-emerald-500'
+                    ? 'bg-red-600 text-white border-red-500'
                     : 'bg-stone-900 text-stone-400 border-stone-800 hover:text-white'
                 }`}
               >

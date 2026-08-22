@@ -121,11 +121,11 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
                   {order.paymentMethod.replace('_', ' ')}
                 </p>
                 {order.fonepayTraceId && (
-                  <p className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 truncate">
+                  <p className="font-mono text-[10px] text-red-600 dark:text-red-400 truncate">
                     Trace: {order.fonepayTraceId}
                   </p>
                 )}
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mt-1">
+                <p className="text-[10px] text-red-600 dark:text-red-400 font-bold uppercase tracking-wider mt-1">
                   Status: {order.paymentStatus === 'completed' ? '✓ Verified' : 'Pending Payment'}
                 </p>
               </div>
@@ -173,7 +173,7 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
                 <span className="font-semibold text-stone-900 dark:text-stone-100">{formatNPR(subtotal)}</span>
               </div>
               {order.discount > 0 && (
-                <div className="flex justify-between text-emerald-600 dark:text-emerald-400 font-medium">
+                <div className="flex justify-between text-red-600 dark:text-red-400 font-medium">
                   <span>Discount:</span>
                   <span>-{formatNPR(order.discount)}</span>
                 </div>

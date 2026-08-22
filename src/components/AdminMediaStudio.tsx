@@ -727,7 +727,7 @@ export const AdminMediaStudio: React.FC<AdminMediaStudioProps> = ({
               {/* Upload & Add New Photo Section */}
               <div className="border-t border-stone-200 dark:border-stone-800 pt-6 space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-stone-900 dark:text-stone-100 flex items-center gap-2">
-                  <Plus className="w-4 h-4 text-emerald-600" />
+                  <Plus className="w-4 h-4 text-red-600" />
                   <span>Upload & Add Another Photo to This Product</span>
                 </h4>
 

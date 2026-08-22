@@ -135,7 +135,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
                 }}
                 className="w-full text-left px-3 py-2 bg-stone-900 dark:bg-white text-white dark:text-black font-bold flex items-center gap-2 transition-colors cursor-pointer uppercase tracking-wider text-[11px]"
               >
-                <ShieldCheck className="w-4 h-4 text-emerald-400 dark:text-emerald-700" />
+                <ShieldCheck className="w-4 h-4 text-red-400 dark:text-red-700" />
                 <span>OPEN ADMIN HUB</span>
               </button>
             ) : (

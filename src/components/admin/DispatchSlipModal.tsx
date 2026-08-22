@@ -140,7 +140,7 @@ export const DispatchSlipModal: React.FC<DispatchSlipModalProps> = ({
                 {isCOD ? (
                   <span className="text-amber-800 font-mono">CASH ON DELIVERY (COD)</span>
                 ) : (
-                  <span className="text-emerald-800 font-mono">PAID ONLINE ({order.paymentMethod.toUpperCase()})</span>
+                  <span className="text-red-800 font-mono">PAID ONLINE ({order.paymentMethod.toUpperCase()})</span>
                 )}
               </div>
               <p className="text-[11px] text-stone-600 font-light">

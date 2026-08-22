@@ -288,7 +288,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {currentUser.isAdmin && (
               <button
                 onClick={onOpenAdmin}
-                className="px-1.5 py-0.5 bg-stone-100 dark:bg-stone-800 text-[#16a34a] font-bold text-[10px] rounded hover:bg-stone-200 dark:hover:bg-stone-700"
+                className="px-1.5 py-0.5 bg-stone-100 dark:bg-stone-800 text-[#dc2626] font-bold text-[10px] rounded hover:bg-stone-200 dark:hover:bg-stone-700"
               >
                 ADMIN
               </button>
@@ -342,13 +342,13 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => handleNavClick('all')}
               className={`py-6 relative font-medium transition-colors cursor-pointer ${
                 selectedCategory === 'all' && !activeMegaMenu
-                  ? 'text-[#16a34a] font-semibold'
-                  : 'text-stone-800 dark:text-stone-200 hover:text-[#16a34a]'
+                  ? 'text-[#dc2626] font-semibold'
+                  : 'text-stone-800 dark:text-stone-200 hover:text-[#dc2626]'
               }`}
             >
               <span>Home</span>
               {selectedCategory === 'all' && !activeMegaMenu && (
-                <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#16a34a]" />
+                <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#dc2626]" />
               )}
             </button>
 
@@ -362,13 +362,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleNavClick('mens')}
                 className={`py-6 relative font-medium transition-colors cursor-pointer flex items-center gap-1 ${
                   selectedCategory === 'mens' || activeMegaMenu === 'mens'
-                    ? 'text-[#16a34a] font-semibold'
-                    : 'text-stone-800 dark:text-stone-200 hover:text-[#16a34a]'
+                    ? 'text-[#dc2626] font-semibold'
+                    : 'text-stone-800 dark:text-stone-200 hover:text-[#dc2626]'
                 }`}
               >
                 <span>Men's</span>
                 {(selectedCategory === 'mens' || activeMegaMenu === 'mens') && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#16a34a]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#dc2626]" />
                 )}
               </button>
             </div>
@@ -383,13 +383,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleNavClick('womens')}
                 className={`py-6 relative font-medium transition-colors cursor-pointer flex items-center gap-1 ${
                   selectedCategory === 'womens' || activeMegaMenu === 'womens'
-                    ? 'text-[#16a34a] font-semibold'
-                    : 'text-stone-800 dark:text-stone-200 hover:text-[#16a34a]'
+                    ? 'text-[#dc2626] font-semibold'
+                    : 'text-stone-800 dark:text-stone-200 hover:text-[#dc2626]'
                 }`}
               >
                 <span>Women's</span>
                 {(selectedCategory === 'womens' || activeMegaMenu === 'womens') && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#16a34a]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#dc2626]" />
                 )}
               </button>
             </div>
@@ -404,13 +404,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleNavClick('kids')}
                 className={`py-6 relative font-medium transition-colors cursor-pointer flex items-center gap-1 ${
                   selectedCategory === 'kids' || activeMegaMenu === 'kids'
-                    ? 'text-[#16a34a] font-semibold'
-                    : 'text-stone-800 dark:text-stone-200 hover:text-[#16a34a]'
+                    ? 'text-[#dc2626] font-semibold'
+                    : 'text-stone-800 dark:text-stone-200 hover:text-[#dc2626]'
                 }`}
               >
                 <span>Kids'</span>
                 {(selectedCategory === 'kids' || activeMegaMenu === 'kids') && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#16a34a]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#dc2626]" />
                 )}
               </button>
             </div>
@@ -425,13 +425,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleNavClick('bags_gears')}
                 className={`py-6 relative font-medium transition-colors cursor-pointer flex items-center gap-1 ${
                   selectedCategory === 'bags_gears' || activeMegaMenu === 'bags_gears'
-                    ? 'text-[#16a34a] font-semibold'
-                    : 'text-stone-800 dark:text-stone-200 hover:text-[#16a34a]'
+                    ? 'text-[#dc2626] font-semibold'
+                    : 'text-stone-800 dark:text-stone-200 hover:text-[#dc2626]'
                 }`}
               >
                 <span>Bags&gears</span>
                 {(selectedCategory === 'bags_gears' || activeMegaMenu === 'bags_gears') && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#16a34a]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#dc2626]" />
                 )}
               </button>
             </div>
@@ -446,13 +446,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => handleNavClick('shoes')}
                 className={`py-6 relative font-medium transition-colors cursor-pointer flex items-center gap-1 ${
                   selectedCategory === 'shoes' || activeMegaMenu === 'shoes'
-                    ? 'text-[#16a34a] font-semibold'
-                    : 'text-stone-800 dark:text-stone-200 hover:text-[#16a34a]'
+                    ? 'text-[#dc2626] font-semibold'
+                    : 'text-stone-800 dark:text-stone-200 hover:text-[#dc2626]'
                 }`}
               >
                 <span>Shoes</span>
                 {(selectedCategory === 'shoes' || activeMegaMenu === 'shoes') && (
-                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#16a34a]" />
+                  <span className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#dc2626]" />
                 )}
               </button>
             </div>
@@ -464,7 +464,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                className="p-1.5 text-stone-800 dark:text-stone-200 hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer focus:outline-none rounded-full hover:bg-stone-100 dark:hover:bg-stone-900"
+                className="p-1.5 text-stone-800 dark:text-stone-200 hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer focus:outline-none rounded-full hover:bg-stone-100 dark:hover:bg-stone-900"
                 title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                 aria-label="Toggle theme"
               >
@@ -479,7 +479,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Search Icon */}
             <button
               onClick={() => setShowSearchModal(true)}
-              className="p-1.5 hover:text-[#16a34a] transition-colors cursor-pointer focus:outline-none"
+              className="p-1.5 hover:text-[#dc2626] transition-colors cursor-pointer focus:outline-none"
               title="Search store catalog"
               aria-label="Search"
             >
@@ -489,26 +489,26 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* User Profile / Sign-in Icon */}
             <button
               onClick={currentUser ? onOpenAdmin : onOpenLoginModal}
-              className="p-1.5 hover:text-[#16a34a] transition-colors cursor-pointer focus:outline-none relative"
+              className="p-1.5 hover:text-[#dc2626] transition-colors cursor-pointer focus:outline-none relative"
               title={currentUser ? `Logged in as ${currentUser.name}` : 'Sign In'}
               aria-label="Account"
             >
               <User className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
               {currentUser?.isAdmin && (
-                <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-[#16a34a] rounded-full ring-2 ring-white dark:ring-stone-900" />
+                <span className="absolute top-0.5 right-0.5 w-2 h-2 bg-[#dc2626] rounded-full ring-2 ring-white dark:ring-stone-900" />
               )}
             </button>
 
             {/* Shopping Cart Icon with Counter Badge */}
             <button
               onClick={onOpenCart}
-              className="p-1.5 hover:text-[#16a34a] transition-colors cursor-pointer focus:outline-none relative"
+              className="p-1.5 hover:text-[#dc2626] transition-colors cursor-pointer focus:outline-none relative"
               title="Shopping Cart"
               aria-label="Cart"
             >
               <ShoppingBag className="w-5 h-5 sm:w-5.5 sm:h-5.5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1.5 bg-[#16a34a] text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs">
+                <span className="absolute -top-1 -right-1.5 bg-[#dc2626] text-white text-[10px] font-bold w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-xs">
                   {cartCount}
                 </span>
               )}
@@ -531,7 +531,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className="space-y-3">
                   <button
                     onClick={() => handleNavClick(MEGA_MENU_DATA[activeMegaMenu].categoryKey)}
-                    className="block text-left text-base font-bold text-black dark:text-white hover:text-[#16a34a] transition-colors cursor-pointer"
+                    className="block text-left text-base font-bold text-black dark:text-white hover:text-[#dc2626] transition-colors cursor-pointer"
                   >
                     {MEGA_MENU_DATA[activeMegaMenu].leftLinks[0].label}
                   </button>
@@ -557,7 +557,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       const el = document.getElementById('catalog-section');
                       el?.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="block text-left text-sm font-bold text-stone-900 dark:text-stone-200 hover:text-[#16a34a] transition-colors cursor-pointer tracking-wider"
+                    className="block text-left text-sm font-bold text-stone-900 dark:text-stone-200 hover:text-[#dc2626] transition-colors cursor-pointer tracking-wider"
                   >
                     NEW ARRIVAL
                   </button>
@@ -578,7 +578,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                             const el = document.getElementById('catalog-section');
                             el?.scrollIntoView({ behavior: 'smooth' });
                           }}
-                          className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left block"
+                          className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left block"
                         >
                           {acc}
                         </button>
@@ -606,7 +606,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                               const el = document.getElementById('catalog-section');
                               el?.scrollIntoView({ behavior: 'smooth' });
                             }}
-                            className="hover:text-[#16a34a] dark:hover:text-[#22c55e] hover:translate-x-1 transition-all cursor-pointer text-left block"
+                            className="hover:text-[#dc2626] dark:hover:text-[#ef4444] hover:translate-x-1 transition-all cursor-pointer text-left block"
                           >
                             {item}
                           </button>
@@ -652,7 +652,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                   <button
                     onClick={onToggleTheme}
-                    className="px-2.5 py-1 text-[11px] font-bold uppercase rounded bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 hover:border-[#16a34a] transition-all"
+                    className="px-2.5 py-1 text-[11px] font-bold uppercase rounded bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 hover:border-[#dc2626] transition-all"
                   >
                     Switch to {theme === 'dark' ? 'Light' : 'Dark'}
                   </button>
@@ -673,7 +673,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     <div className="flex items-center justify-between">
                       <button
                         onClick={() => handleNavClick(data.categoryKey)}
-                        className="text-left py-2.5 px-3 text-sm font-semibold text-stone-900 dark:text-stone-100 hover:text-[#16a34a] flex-1"
+                        className="text-left py-2.5 px-3 text-sm font-semibold text-stone-900 dark:text-stone-100 hover:text-[#dc2626] flex-1"
                       >
                         {data.title}
                       </button>
@@ -707,7 +707,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                                     onSearchChange(item.toLowerCase());
                                     setMobileMenuOpen(false);
                                   }}
-                                  className="text-left py-0.5 hover:text-[#16a34a] dark:hover:text-[#22c55e]"
+                                  className="text-left py-0.5 hover:text-[#dc2626] dark:hover:text-[#ef4444]"
                                 >
                                   {item}
                                 </button>
@@ -730,7 +730,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                   className="flex items-center gap-2 w-full py-2 px-3 hover:bg-stone-50 dark:hover:bg-stone-900 rounded"
                 >
-                  <PackageCheck className="w-4 h-4 text-[#16a34a]" />
+                  <PackageCheck className="w-4 h-4 text-[#dc2626]" />
                   <span>Order Status</span>
                 </button>
                 <button
@@ -740,7 +740,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                   className="flex items-center gap-2 w-full py-2 px-3 hover:bg-stone-50 dark:hover:bg-stone-900 rounded"
                 >
-                  <MapPin className="w-4 h-4 text-[#16a34a]" />
+                  <MapPin className="w-4 h-4 text-[#dc2626]" />
                   <span>Find a Store</span>
                 </button>
                 <button
@@ -750,7 +750,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }}
                   className="flex items-center gap-2 w-full py-2 px-3 hover:bg-stone-50 dark:hover:bg-stone-900 rounded"
                 >
-                  <HelpCircle className="w-4 h-4 text-[#16a34a]" />
+                  <HelpCircle className="w-4 h-4 text-[#dc2626]" />
                   <span>Customer Help</span>
                 </button>
               </div>
@@ -779,7 +779,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     onOpenLoginModal();
                   }}
-                  className="w-full py-2.5 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider text-center rounded"
+                  className="w-full py-2.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-bold text-xs uppercase tracking-wider text-center rounded"
                 >
                   Sign In
                 </button>
@@ -802,9 +802,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <div className="space-y-4">
               <div className="flex items-center gap-2">
-                <Search className="w-5 h-5 text-[#16a34a]" />
+                <Search className="w-5 h-5 text-[#dc2626]" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white">
-                  Search Sonam Gear Catalog
+                  Search GEARTRADE Catalog
                 </h3>
               </div>
 
@@ -815,7 +815,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   placeholder="Search jackets, down fleeces, trekking pants, backpacks, boots..."
-                  className="w-full pl-4 pr-10 py-3 bg-stone-50 dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-sm text-black dark:text-white placeholder-stone-400 focus:outline-none focus:border-[#16a34a] font-medium"
+                  className="w-full pl-4 pr-10 py-3 bg-stone-50 dark:bg-stone-800 border border-stone-300 dark:border-stone-700 text-sm text-black dark:text-white placeholder-stone-400 focus:outline-none focus:border-[#dc2626] font-medium"
                 />
                 {searchQuery && (
                   <button
@@ -850,7 +850,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                         const el = document.getElementById('catalog-section');
                         el?.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="px-3 py-1 bg-stone-100 dark:bg-stone-800 hover:bg-[#16a34a] hover:text-white text-stone-700 dark:text-stone-300 text-xs font-medium rounded-full transition-colors cursor-pointer"
+                      className="px-3 py-1 bg-stone-100 dark:bg-stone-800 hover:bg-[#dc2626] hover:text-white text-stone-700 dark:text-stone-300 text-xs font-medium rounded-full transition-colors cursor-pointer"
                     >
                       {tag}
                     </button>
@@ -875,7 +875,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
             <div className="space-y-5">
               <div className="flex items-center gap-3 border-b border-stone-100 dark:border-stone-800 pb-3">
-                <div className="w-10 h-10 bg-[#16a34a]/10 text-[#16a34a] rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-[#dc2626]/10 text-[#dc2626] rounded-full flex items-center justify-center">
                   <HelpCircle className="w-5 h-5" />
                 </div>
                 <div>
@@ -890,7 +890,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
               <div className="space-y-3 text-xs text-stone-700 dark:text-stone-300">
                 <div className="p-3 bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 flex items-start gap-3">
-                  <Phone className="w-4 h-4 text-[#16a34a] mt-0.5" />
+                  <Phone className="w-4 h-4 text-[#dc2626] mt-0.5" />
                   <div>
                     <p className="font-bold text-black dark:text-white">Customer Care Hotline</p>
                     <p className="text-stone-600 dark:text-stone-300 mt-0.5">+977-1-4412345 / 9801234567</p>
@@ -899,7 +899,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
 
                 <div className="p-3 bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 flex items-start gap-3">
-                  <Mail className="w-4 h-4 text-[#16a34a] mt-0.5" />
+                  <Mail className="w-4 h-4 text-[#dc2626] mt-0.5" />
                   <div>
                     <p className="font-bold text-black dark:text-white">Email Support</p>
                     <p className="text-stone-600 dark:text-stone-300 mt-0.5">support@geartradenepal.com</p>
@@ -907,7 +907,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
 
                 <div className="p-3 bg-stone-50 dark:bg-stone-800/60 border border-stone-200 dark:border-stone-700 flex items-start gap-3">
-                  <PackageCheck className="w-4 h-4 text-[#16a34a] mt-0.5" />
+                  <PackageCheck className="w-4 h-4 text-[#dc2626] mt-0.5" />
                   <div>
                     <p className="font-bold text-black dark:text-white">Returns & 7-Day Exchange Policy</p>
                     <p className="text-stone-600 dark:text-stone-300 mt-0.5">
@@ -922,7 +922,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setShowHelpModal(false);
                   onOpenStoreLocator();
                 }}
-                className="w-full py-2.5 bg-[#16a34a] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider text-center flex items-center justify-center gap-2 cursor-pointer rounded"
+                className="w-full py-2.5 bg-[#dc2626] hover:bg-[#b91c1c] text-white font-bold text-xs uppercase tracking-wider text-center flex items-center justify-center gap-2 cursor-pointer rounded"
               >
                 <MapPin className="w-4 h-4" />
                 <span>Find GEARTRADE Retail Stores</span>

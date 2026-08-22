@@ -50,11 +50,11 @@ export const Footer: React.FC<FooterProps> = ({
               Explore a retail store or outlet near you.
             </p>
 
-            {/* Vibrant Green "Find a store →" Button */}
+            {/* Vibrant Red "Find a store →" Button */}
             <div>
               <button
                 onClick={onOpenStoreLocator}
-                className="inline-flex items-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-2.5 rounded-md font-bold text-xs sm:text-sm tracking-wide transition-all cursor-pointer shadow-xs hover:shadow-md active:scale-95"
+                className="inline-flex items-center gap-2 bg-[#dc2626] hover:bg-[#b91c1c] text-white px-5 py-2.5 rounded-md font-bold text-xs sm:text-sm tracking-wide transition-all cursor-pointer shadow-xs hover:shadow-md active:scale-95"
               >
                 <span>Find a store</span>
                 <ArrowRight className="w-4 h-4" />
@@ -115,7 +115,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => handleCategoryClick('mens')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Men's
                   </button>
@@ -123,7 +123,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => handleCategoryClick('womens')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Women's
                   </button>
@@ -131,7 +131,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => handleCategoryClick('kids')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Kids'
                   </button>
@@ -139,7 +139,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => handleCategoryClick('bags_gears')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Bags&gears
                   </button>
@@ -147,7 +147,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => handleCategoryClick('shoes')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Shoes
                   </button>
@@ -164,7 +164,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={onOpenLoginModal}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Login
                   </button>
@@ -172,7 +172,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={onOpenCart}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     My Cart
                   </button>
@@ -180,7 +180,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={onOpenTracker}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Order Status
                   </button>
@@ -197,7 +197,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('shipping')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Shipping Policy
                   </button>
@@ -205,7 +205,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('returns')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Returns & Refunds
                   </button>
@@ -213,7 +213,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('cookies')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Cookies Policy
                   </button>
@@ -221,7 +221,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('faq')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Frequently asked
                   </button>
@@ -238,7 +238,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('about')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     About us
                   </button>
@@ -246,7 +246,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('privacy')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Privacy Policy
                   </button>
@@ -254,7 +254,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('terms')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Terms & Conditions
                   </button>
@@ -262,7 +262,7 @@ export const Footer: React.FC<FooterProps> = ({
                 <li>
                   <button
                     onClick={() => setActiveModal('contact')}
-                    className="hover:text-[#16a34a] dark:hover:text-[#22c55e] transition-colors cursor-pointer text-left"
+                    className="hover:text-[#dc2626] dark:hover:text-[#ef4444] transition-colors cursor-pointer text-left"
                   >
                     Contact Us
                   </button>
@@ -291,7 +291,7 @@ export const Footer: React.FC<FooterProps> = ({
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-b border-stone-100 dark:border-stone-800 pb-3">
-                <FileText className="w-5 h-5 text-[#16a34a]" />
+                <FileText className="w-5 h-5 text-[#dc2626]" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-black dark:text-white">
                   {activeModal === 'shipping' && 'Shipping Policy'}
                   {activeModal === 'returns' && 'Returns & Refunds Policy'}

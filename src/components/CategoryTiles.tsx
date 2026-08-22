@@ -75,7 +75,7 @@ export const CategoryTiles: React.FC<CategoryTilesProps> = ({
               onClick={() => handleClick(card.id)}
               className={`group relative aspect-[3/4] overflow-hidden rounded-xl bg-stone-100 dark:bg-stone-900 cursor-pointer border transition-all duration-300 ${
                 isSelected
-                  ? 'border-[#16a34a] ring-2 ring-[#16a34a] ring-offset-2 ring-offset-white dark:ring-offset-stone-950 shadow-md'
+                  ? 'border-[#dc2626] ring-2 ring-[#dc2626] ring-offset-2 ring-offset-white dark:ring-offset-stone-950 shadow-md'
                   : 'border-stone-200 dark:border-stone-800 hover:border-black dark:hover:border-stone-400 hover:shadow-lg'
               }`}
             >
